@@ -10,7 +10,7 @@ Presentación escolar interactiva: cada compañero, desde su celular, vive la hi
 5. **D** abre/cierra preguntas para debatir en la escena actual (léelas en voz alta y deja hablar a la clase).
 6. En las escenas del Terror: **A** = arrestos por azar (escena Danton) · **F** = publicar destinos (los dos tribunales) · **R** = re-sortear al “rey”.
 7. **Sin celulares / sin wifi:** en la pantalla de entrada pulsa “Modo sin celulares”. Todas las escenas funcionan con datos simulados, rotulados como tales.
-8. Después: `delete from public.sessions where code = 'TUCODIGO';` en el SQL editor (la cascada borra todo lo de la sala).
+8. **Al terminar:** en la última escena (Fuentes) hay un botón muy tenue que dice “cerrar”, abajo a la derecha (también al final de `/#/moderar`). Pide escribir el código de la sala y borra TODO: jugadores, decisiones y textos. Los celulares muestran “Gracias por jugar”. No se puede deshacer.
 
 ## Presentar desde el celular
 `/#/presentar` detecta pantallas angostas o verticales y muestra una vista móvil: texto grande, desplazamiento vertical, **deslizar ← →** para cambiar de escena y botones para lo que en el proyector son atajos (arrestos, destinos, re-sortear al “rey”, preguntas para debatir). Úsala como control remoto o para ensayar.

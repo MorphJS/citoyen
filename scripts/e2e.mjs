@@ -204,7 +204,29 @@ while (scene !== 'fuentes' && guard++ < 40) {
 }
 check('se recorrieron todas las escenas hasta Fuentes', scene === 'fuentes', `${seen.size} escenas`)
 
-console.log(`\nSala de prueba: ${code} → delete from public.sessions where code = '${code}';`)
+// ---- Cierre: el botón discreto borra TODOS los datos de la sala ----
+await sleep(1200)
+const endSel = 'button[aria-label="Cerrar la actividad y borrar los datos"]'
+const endBtn = await hostPage.$(endSel)
+check('cierre: hay un botón pequeño y discreto en la última escena', !!endBtn)
+const op = endBtn ? await hostPage.evaluate((s) => getComputedStyle(document.querySelector(s)).opacity, endSel) : '1'
+check('cierre: el botón es disimulado (baja opacidad)', Number(op) < 0.4, 'opacity=' + op)
+await endBtn.click(); await sleep(500)
+check('cierre: pide el código y deshabilita el borrado hasta escribirlo', await hostPage.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.innerText.includes('Borrar todo'))?.disabled === true))
+await hostPage.type('[role=dialog] input', code)
+await clickText(hostPage, 'Borrar todo')
+await sleep(2500)
+const left = {
+  sessions: (await sb.from('sessions').select('id').eq('code', code)).data?.length,
+  players: (await sb.from('players').select('id').eq('session_id', SID)).data?.length,
+  decisions: (await sb.from('decisions').select('id').eq('session_id', SID)).data?.length,
+  posts: (await sb.from('posts').select('id').eq('session_id', SID)).data?.length,
+}
+check('cierre: se borraron sala, jugadores, decisiones y textos', Object.values(left).every((n) => n === 0), JSON.stringify(left))
+check('cierre: los celulares avisan que la actividad terminó', await waitText(phones[0], 'Gracias por jugar', 12000))
+await shot(phones[0], 'phone_13_cierre')
+check('cierre: el celular olvida su sesión guardada', await phones[0].evaluate((c) => localStorage.getItem('citoyen:player:' + c) === null, code))
+console.log('\nSala de prueba borrada por la propia app: ' + code)
 const failed = results.filter((x) => !x).length
 console.log(failed === 0 ? 'E2E VERDE' : `E2E ROJO: ${failed} fallo(s)`)
 await browser.close()

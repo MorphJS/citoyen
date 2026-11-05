@@ -4,6 +4,7 @@ import { applyArrests, enterScene, publishFates, type HostCreds, type HostCtx } 
 import { useHostData } from '../hooks/useHostData.ts'
 import { hostKick, hostListPending, hostModerate, type PostRow } from '../lib/api.ts'
 import { loadCreds, saveCreds } from '../lib/hostCreds.ts'
+import EndButton from '../host/EndButton.tsx'
 import { normalizeCode } from '../lib/code.ts'
 
 const field = 'min-h-12 w-full rounded-lg border border-white/25 bg-black/40 px-4 text-lg text-parchment outline-none focus:border-gold'
@@ -115,6 +116,7 @@ function Panel({ creds }: { creds: HostCreds }) {
           ))}
         </ul>
       </section>
+      <div className="mt-6 text-right"><EndButton creds={creds} onDone={() => location.reload()} /></div>
     </main>
   )
 }

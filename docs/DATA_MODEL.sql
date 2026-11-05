@@ -293,3 +293,17 @@ alter publication supabase_realtime add table public.posts;
 
 -- ---------- Limpieza ----------
 -- Tras la presentación: delete from public.sessions where code = 'XXXX';  (cascada borra todo lo demás)
+
+-- ---------- Cierre de la actividad (borra TODOS los datos de la sala) ----------
+create or replace function public.host_end_session(p_code text, p_host_secret text)
+returns void
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare v_id uuid := public._check_host(p_code, p_host_secret);
+begin
+  delete from sessions where id = v_id;   -- la cascada borra todo lo demás
+end $$;
+revoke all on function public.host_end_session(text, text) from public;
+grant execute on function public.host_end_session(text, text) to anon, authenticated;

@@ -60,6 +60,9 @@ export async function hostListPending(code: string, secret: string): Promise<Pos
 export async function hostModerate(code: string, secret: string, post: string, status: 'approved' | 'rejected'): Promise<void> {
   check(await supabase.rpc('host_moderate_post', { p_code: code, p_host_secret: secret, p_post: post, p_status: status }))
 }
+export async function hostEndSession(code: string, secret: string): Promise<void> {
+  check(await supabase.rpc('host_end_session', { p_code: code, p_host_secret: secret }))
+}
 export async function hostKick(code: string, secret: string, player: string): Promise<void> {
   check(await supabase.rpc('host_kick_player', { p_code: code, p_host_secret: secret, p_player: player }))
 }

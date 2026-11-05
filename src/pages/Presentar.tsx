@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { ESCENAS, img } from '../content/escenas.ts'
 import Deck from '../host/Deck.tsx'
 import MobileDeck from '../host/MobileDeck.tsx'
+import EndButton from '../host/EndButton.tsx'
 import { useNarrow } from '../hooks/useNarrow.ts'
 import { makeDemo } from '../host/demo.ts'
 import { applyArrests, enterScene, publishFates, type HostCreds, type HostCtx } from '../host/ops.ts'
@@ -144,6 +145,7 @@ function Live({ creds, demo, onExit }: { creds: HostCreds | null; demo: boolean;
   const Stage = narrow ? MobileDeck : Deck
   return (
     <Stage
+      endSlot={!demo && creds ? <EndButton creds={creds} onDone={onExit} /> : undefined}
       onAction={(k: 'arrestos' | 'destinos' | 'rey') => void doAction(k)} onToggleDebate={() => setDebate((x) => !x)}
       index={index} go={(i) => void go(i)} demo={demo} toast={toast} debate={debate}
       offline={!demo && !!real.error}

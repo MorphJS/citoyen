@@ -69,6 +69,15 @@ function Play({ code, creds }: { code: string; creds: Creds }) {
     void pd.refresh()
   }, [pd, creds])
 
+  if (pd.ended) {
+    try { localStorage.removeItem(credKey(code)) } catch { /* nada */ }
+    return (
+      <main className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
+        <p className="m-0 font-serif text-[40px] font-bold text-gold">Gracias por jugar</p>
+        <p className="m-0 text-[18px] leading-snug text-parchment/80">La actividad terminó y el presentador borró todos los datos. Tus decisiones ya no están guardadas en ningún lugar.</p>
+      </main>
+    )
+  }
   if (!pd.session || !pd.me) {
     return <main className="flex min-h-dvh items-center justify-center text-parchment/70">{pd.error ? 'Sin conexión… reintentando' : 'Entrando a la sala…'}</main>
   }

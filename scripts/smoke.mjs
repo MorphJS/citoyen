@@ -61,11 +61,13 @@ check('10 insert directo falla', fails(r), r.error?.message)
 // 11
 await rpc('host_set_scene', { p_code: code, p_host_secret: secret, p_scene: 'a3_cordelier' })
 await rpc('submit_post', { p_player: player_id, p_token: token, p_scene: 'a3_cordelier', p_body: 'Piedad, ciudadanos' })
-const before = await sb.from('posts').select('id')
+// Solo los textos de ESTA sala (otras salas pueden existir en la misma base).
+const SID = (await sb.from('sessions').select('id').eq('code', code).single()).data.id
+const before = await sb.from('posts').select('id').eq('session_id', SID)
 const pend = await rpc('host_list_pending_posts', { p_code: code, p_host_secret: secret })
 const postId = pend.data?.[0]?.id
 await rpc('host_moderate_post', { p_code: code, p_host_secret: secret, p_post: postId, p_status: 'approved' })
-const after = await sb.from('posts').select('id')
+const after = await sb.from('posts').select('id').eq('session_id', SID)
 check('11 post pendiente invisible → aprobado visible', before.data?.length === 0 && after.data?.length === 1, `${before.data?.length} → ${after.data?.length}`)
 // 12
 r = await rpc('host_set_fates', { p_code: code, p_host_secret: secret, p_fates: [{ player_id, fate: 'absuelto' }] })
@@ -76,7 +78,15 @@ await rpc('host_kick_player', { p_code: code, p_host_secret: secret, p_player: p
 r = await rpc('submit_decision', { p_player: player_id, p_token: token, p_scene: 'a3_cordelier', p_choice: 'x', p_prompt_key: 'k3' })
 check('13 jugador expulsado no puede decidir', fails(r), r.error?.message)
 
-console.log(`\nSesión de prueba: ${code}  (bórrala: delete from public.sessions where code = '${code}';)`)
+// 14-15: cerrar la actividad borra todo, y solo con la contraseña correcta
+r = await rpc('host_end_session', { p_code: code, p_host_secret: 'malo' })
+const still = await sb.from('sessions').select('id').eq('code', code)
+check('14 cerrar con contraseña incorrecta falla y NO borra', fails(r) && still.data?.length === 1, r.error?.message)
+r = await rpc('host_end_session', { p_code: code, p_host_secret: secret })
+const gone = await sb.from('sessions').select('id').eq('code', code)
+const goneP = await sb.from('players').select('id').eq('id', player_id)
+check('15 cerrar con la contraseña correcta borra sala y jugadores (cascada)', !fails(r) && gone.data?.length === 0 && goneP.data?.length === 0, r.error?.message)
+console.log(`\nLa sala de prueba ${code} ya fue borrada por el propio smoke.`)
 const failed = results.filter((x) => !x).length
 console.log(failed === 0 ? 'HUMO VERDE' : `HUMO ROJO: ${failed} fallo(s)`)
 process.exit(failed === 0 ? 0 : 1)

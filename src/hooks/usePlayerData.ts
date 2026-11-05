@@ -9,6 +9,8 @@ const CROWD_SCENES = ['a1_rumor', 'a3_decreto']
 export type Crowd = { total: number; players: number; by: Record<string, number> }
 
 export type PlayerData = {
+  /** La sala fue cerrada y borrada por el presentador. */
+  ended: boolean
   crowd: Crowd
   session: SessionRow | null
   me: PlayerRow | null
@@ -28,6 +30,7 @@ export function usePlayerData(code: string, playerId: string): PlayerData {
   const [decisions, setDecisions] = useState<DecisionRow[]>([])
   const [posts, setPosts] = useState<PostRow[]>([])
   const [crowd, setCrowd] = useState<Crowd>({ total: 0, players: 0, by: {} })
+  const [ended, setEnded] = useState(false)
   const [live, setLive] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const busy = useRef(false)
@@ -39,6 +42,7 @@ export function usePlayerData(code: string, playerId: string): PlayerData {
       const [s, p, d, po] = await Promise.all([getSessionByCode(code), getPlayer(playerId), myDecisions(playerId), myApprovedPosts(playerId)])
       setSession(s)
       setMe(p)
+      if (!s && !p) setEnded(true)
       if (s && CROWD_SCENES.includes(s.scene)) {
         const [rows, n] = await Promise.all([listSceneChoices(s.id, s.scene), countActivePlayers(s.id)])
         const by: Record<string, number> = {}
@@ -69,5 +73,5 @@ export function usePlayerData(code: string, playerId: string): PlayerData {
   }, [refresh, playerId])
 
   const addLocalDecision = useCallback((d: DecisionRow) => setDecisions((prev) => [...prev, d]), [])
-  return { crowd, session, me, decisions, posts, live, error, refresh, addLocalDecision }
+  return { ended, crowd, session, me, decisions, posts, live, error, refresh, addLocalDecision }
 }

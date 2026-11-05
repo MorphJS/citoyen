@@ -174,7 +174,7 @@ function Content({ e, d, joinUrl, demo }: { e: Escena; d: DeckProps['data']; joi
   )
 }
 
-export default function MobileDeck({ index, go, data, demo, joinUrl, toast, offline, debate, onAction, onToggleDebate }: DeckProps & { onAction?: (k: 'arrestos' | 'destinos' | 'rey') => void; onToggleDebate?: () => void }) {
+export default function MobileDeck({ index, go, data, demo, joinUrl, toast, offline, debate, endSlot, onAction, onToggleDebate }: DeckProps & { onAction?: (k: 'arrestos' | 'destinos' | 'rey') => void; onToggleDebate?: () => void }) {
   const e = ESCENAS[index]
   const p = PALETAS[e.acto]
   const [fx, fy] = e.foco ?? [50, 50]
@@ -239,6 +239,8 @@ export default function MobileDeck({ index, go, data, demo, joinUrl, toast, offl
       <AnimatePresence>
         {toast && <motion.div key={toast} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute inset-x-4 top-14 z-40 rounded-xl border bg-black/90 px-4 py-2 text-center text-[14px]" style={{ borderColor: 'var(--accent)' }}>{toast}</motion.div>}
       </AnimatePresence>
+
+      {endSlot && index === ESCENAS.length - 1 && <div className="absolute right-1 z-30" style={{ bottom: 'calc(118px + env(safe-area-inset-bottom))' }}>{endSlot}</div>}
 
       {/* barra de mando */}
       <nav className="relative z-20 border-t border-white/15 bg-black/85 px-3 pb-[max(10px,env(safe-area-inset-bottom))] pt-2 backdrop-blur">

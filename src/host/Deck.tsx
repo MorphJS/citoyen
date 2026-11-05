@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { QRCodeSVG } from 'qrcode.react'
+import type { ReactNode } from 'react'
 import { FilterDefs, Grain } from '../components/cinema/Grain.tsx'
 import { ESCENAS, PALETAS, img, type Escena } from '../content/escenas.ts'
 import { hashSeed } from '../game/rng.ts'
@@ -12,6 +13,7 @@ const GRADE = 'saturate(.55) contrast(1.12) brightness(.5)'
 
 export type DeckData = Pick<DemoData, 'session' | 'players' | 'decisions' | 'posts'>
 export type DeckProps = {
+  endSlot?: ReactNode
   debate?: boolean
   index: number
   go: (i: number) => void
@@ -255,7 +257,7 @@ function Strip({ index, go }: { index: number; go: (i: number) => void }) {
   )
 }
 
-export default function Deck({ index, go, data, demo, joinUrl, toast, offline, debate }: DeckProps) {
+export default function Deck({ index, go, data, demo, joinUrl, toast, offline, debate, endSlot }: DeckProps) {
   const e = ESCENAS[index]
   const p = PALETAS[e.acto]
   const activos = data.players.filter((x) => x.status === 'active').length
@@ -320,6 +322,7 @@ export default function Deck({ index, go, data, demo, joinUrl, toast, offline, d
             </motion.aside>
           )}
         </AnimatePresence>
+        {endSlot && index === ESCENAS.length - 1 && <div className="absolute z-30" style={{ right: '1.2cqw', bottom: '1.4cqw' }}>{endSlot}</div>}
         <Strip index={index} go={go} />
         <div className="absolute bottom-0 left-0 z-20 h-[3px]" style={{ width: `${((index + 1) / ESCENAS.length) * 100}%`, background: 'var(--accent)', transition: 'width .8s cubic-bezier(.22,1,.36,1)' }} />
       </div>
