@@ -37,10 +37,22 @@ export const PALETAS: Record<Acto, Palette> = {
 
 export type Card = { img: ImgKey; tag: string; name: string; line: string }
 
+/** Qué hace el celular en la escena. 'mira' = solo observar el proyector. */
+export type Jug = 'lobby' | 'prompt' | 'rey' | 'grupo' | 'cordelier' | 'danton' | 'tribunal1' | 'pradial' | 'tribunal2' | 'lente' | 'final' | 'mira'
+
+export type Barra = { titulo?: string; scene: string; prompt: string }
+/** Resultados agregados del proyector (nunca quién votó qué). */
+export type Resultados =
+  | { tipo: 'barras'; barras: Barra[]; porVariante?: boolean }
+  | { tipo: 'rey' }
+  | { tipo: 'debrief' }
+
 export type Escena = {
   id: string
+  jug?: Jug
+  resultados?: Resultados
   acto: Acto
-  layout: 'hero' | 'synopsis' | 'cards'
+  layout: 'hero' | 'synopsis' | 'cards' | 'results'
   kicker: string
   title: string
   statement?: string
@@ -54,17 +66,23 @@ export type Escena = {
 
 export const ESCENAS: Escena[] = [
   {
-    id: 'lobby', acto: 0, layout: 'hero', bg: 'bg_bastille',
+    id: 'lobby', jug: 'lobby', acto: 0, layout: 'hero', bg: 'bg_bastille',
     kicker: 'Francia · 1750–1794', title: 'CITOYEN',
     statement: '¿Qué pasa cuando las ideas de libertad se encuentran con el poder?',
     body: 'Escanea el código y vive esta historia como un ciudadano.',
     seals: ['1750', '1794'],
   },
   {
-    id: 'a1_rumor', acto: 1, layout: 'hero', bg: 'bg_salon', vivo: true,
+    id: 'a1_rumor', jug: 'prompt', acto: 1, layout: 'hero', bg: 'bg_salon', vivo: true,
     kicker: 'Acto I · Europa, fines del siglo XVII y siglo XVIII', title: 'EL SIGLO DE LAS LUCES',
     statement: 'Comprobar una afirmación antes de creerla, en lugar de aceptarla solo porque la dijo alguien importante.',
     body: 'La razón, la educación y la ciencia permitían comprender el mundo y mejorar la sociedad.',
+  },
+  {
+    id: 'a1_rumor_resultados', acto: 1, layout: 'results', bg: 'bg_salon',
+    kicker: 'Acto I · Resultado', title: '¿QUÉ HICIMOS CON EL PANFLETO?',
+    statement: 'Comprobar una afirmación antes de creerla, en lugar de aceptarla solo porque la dijo alguien importante.',
+    resultados: { tipo: 'barras', porVariante: true, barras: [{ scene: 'a1_rumor', prompt: 'main' }] },
   },
   {
     id: 'a1_rumor_reveal', acto: 1, layout: 'cards', bg: 'bg_salon',
@@ -78,25 +96,25 @@ export const ESCENAS: Escena[] = [
     ],
   },
   {
-    id: 'a2_rey', acto: 2, layout: 'synopsis', bg: 'bg_asamblea', vivo: true,
+    id: 'a2_rey', jug: 'rey', acto: 2, layout: 'synopsis', bg: 'bg_asamblea', vivo: true,
     kicker: 'Acto II · La Asamblea', title: 'UN SOLO PODER',
     statement: 'Si una sola persona crea las leyes, las aplica y decide quién merece un castigo…',
     body: '…tiene muchas posibilidades de abusar de su autoridad.',
   },
   {
-    id: 'a2_contrapesos', acto: 2, layout: 'cards', bg: 'bg_asamblea', vivo: true,
+    id: 'a2_contrapesos', jug: 'grupo', acto: 2, layout: 'cards', bg: 'bg_asamblea', vivo: true,
     kicker: 'Acto II · Montesquieu', title: 'LÍMITES Y CONTRAPESOS',
     statement: 'La propuesta de Montesquieu buscaba que el poder tuviera límites y contrapesos.',
     cards: [{ img: 'montesquieu', tag: 'Separación de poderes', name: 'Montesquieu', line: 'Distribuir el poder para evitar abusos.' }],
   },
   {
-    id: 'a2_reveal', acto: 2, layout: 'synopsis', bg: 'bg_asamblea',
+    id: 'a2_reveal', acto: 2, layout: 'results', bg: 'bg_asamblea',
     kicker: 'Acto II · Resultado', title: 'UNO CONTRA TRES',
     statement: 'Un solo poder frente a tres poderes que se vigilan.',
-    body: 'Compara qué decidió el “rey” solo y qué decidieron los tres grupos.',
+    resultados: { tipo: 'rey' },
   },
   {
-    id: 'a3_decreto', acto: 3, layout: 'hero', bg: 'bg_terror', vivo: true,
+    id: 'a3_decreto', jug: 'prompt', acto: 3, layout: 'hero', bg: 'bg_terror', vivo: true,
     kicker: 'Acto III · El Terror · 1793', title: 'DEFENDER LA REPÚBLICA',
     statement: 'El Comité de Salvación Pública justificaba las medidas extraordinarias como necesarias para defender la República.',
     // TODO(verificar): CONTENIDO no nombra un decreto concreto; el de esta escena es ficticio y así debe decirlo Jesús.
@@ -104,13 +122,13 @@ export const ESCENAS: Escena[] = [
     seals: ['1793', '1794'],
   },
   {
-    id: 'a3_cordelier', acto: 3, layout: 'cards', bg: 'bg_terror', vivo: true,
+    id: 'a3_cordelier', jug: 'cordelier', acto: 3, layout: 'cards', bg: 'bg_terror', vivo: true,
     kicker: 'Acto III · Le Vieux Cordelier', title: 'PEDIR CLEMENCIA',
     statement: 'Escribe en 140 caracteres. Tu texto pasa por moderación antes de aparecer.',
     cards: [{ img: 'desmoulins', tag: 'Periodista', name: 'Camille Desmoulins', line: 'Criticó los excesos del Terror y pidió clemencia en su periódico Le Vieux Cordelier.' }],
   },
   {
-    id: 'a3_danton', acto: 3, layout: 'cards', bg: 'bg_terror',
+    id: 'a3_danton', jug: 'danton', acto: 3, layout: 'cards', bg: 'bg_terror',
     kicker: 'Acto III · Abril de 1794', title: 'ANTES DEL GRAN TERROR',
     statement: 'Su caso muestra que la persecución también afectaba a participantes de la propia Revolución.',
     cards: [
@@ -119,20 +137,20 @@ export const ESCENAS: Escena[] = [
     ],
   },
   {
-    id: 'a3_tribunal_garantias', acto: 3, layout: 'synopsis', bg: 'bg_terror', vivo: true,
+    id: 'a3_tribunal_garantias', jug: 'tribunal1', acto: 3, layout: 'synopsis', bg: 'bg_terror', vivo: true,
     kicker: 'Acto III · Tribunal Revolucionario', title: 'EL TRIBUNAL',
     statement: 'Los acusados comparecen ante el Tribunal Revolucionario.',
     body: 'Todavía tienen garantías: pueden defenderse.',
   },
   {
-    id: 'a3_pradial', acto: 3, layout: 'hero', bg: 'bg_terror',
+    id: 'a3_pradial', jug: 'pradial', acto: 3, layout: 'hero', bg: 'bg_terror',
     kicker: '10 de junio de 1794', title: 'LEY DEL 22 DE PRADIAL',
     statement: 'Redujo las garantías de los acusados ante el Tribunal Revolucionario y aceleró los procesos.',
     body: 'Las sentencias podían ser la absolución o la muerte.',
     seals: ['GRAN TERROR', 'JUN–JUL 1794'],
   },
   {
-    id: 'a3_tribunal_sin_garantias', acto: 3, layout: 'synopsis', bg: 'bg_terror', vivo: true,
+    id: 'a3_tribunal_sin_garantias', jug: 'tribunal2', acto: 3, layout: 'synopsis', bg: 'bg_terror', vivo: true,
     kicker: 'Acto III · Sin garantías', title: 'SIN DEFENSA',
     statement: 'Ya no hay defensa posible.',
     body: 'El resultado es la absolución o la condena.',
@@ -144,21 +162,36 @@ export const ESCENAS: Escena[] = [
     cards: [{ img: 'robespierre', tag: 'Figura central', name: 'Robespierre', line: 'Fue una figura central, aunque no el único responsable de estas políticas.' }],
   },
   {
-    id: 'a4_fiesta', acto: 4, layout: 'hero', bg: 'bg_nacion', vivo: true,
+    id: 'a3_resultados', acto: 3, layout: 'results', bg: 'bg_terror',
+    kicker: 'Acto III · Balance', title: 'EL COSTO DEL MIEDO',
+    statement: 'El miedo silencia: las personas podían dejar de expresar sus ideas por temor a ser consideradas enemigas.',
+    resultados: { tipo: 'debrief' },
+  },
+  {
+    id: 'a4_fiesta', jug: 'prompt', acto: 4, layout: 'hero', bg: 'bg_nacion', vivo: true,
     kicker: 'Acto IV · La nación · Siglo XIX', title: 'UNA LENGUA, UNA FIESTA',
     statement: 'Compartir lengua y cultura facilita la convivencia y el intercambio cultural.',
   },
   {
-    id: 'a4_union', acto: 4, layout: 'synopsis', bg: 'bg_nacion', vivo: true,
+    id: 'a4_union', jug: 'prompt', acto: 4, layout: 'synopsis', bg: 'bg_nacion', vivo: true,
     kicker: 'Acto IV · Pangermanismo', title: 'UNIR A TODOS',
     statement: 'Unir en un mismo Estado a las poblaciones consideradas alemanas por su lengua, cultura u origen.',
     body: 'El pangermanismo se desarrolló durante el siglo XIX, cuando diversos pueblos buscaban formar o fortalecer sus propias naciones.',
   },
   {
-    id: 'a4_vecino', acto: 4, layout: 'synopsis', bg: 'bg_nacion', vivo: true,
+    id: 'a4_vecino', jug: 'prompt', acto: 4, layout: 'synopsis', bg: 'bg_nacion', vivo: true,
     kicker: 'Acto IV · El vecino', title: 'UN PUEBLO QUE NO QUIERE',
     statement: 'Dos comunidades hablan el mismo idioma. Una no quiere formar parte de tu país.',
     body: 'Eso no significa que una tenga derecho a obligar a la otra.',
+  },
+  {
+    id: 'a4_resultados', acto: 4, layout: 'results', bg: 'bg_nacion',
+    kicker: 'Acto IV · Resultado', title: '¿HASTA DÓNDE LLEGAMOS?',
+    statement: 'Compartir idioma no da derecho a obligar a otra comunidad a unirse a tu país.',
+    resultados: { tipo: 'barras', barras: [
+      { titulo: 'Unir a todos en un Estado', scene: 'a4_union', prompt: 'main' },
+      { titulo: 'El pueblo que no quiere unirse', scene: 'a4_vecino', prompt: 'main' },
+    ] },
   },
   {
     id: 'a4_reveal', acto: 4, layout: 'hero', bg: 'bg_nacion',
@@ -168,13 +201,13 @@ export const ESCENAS: Escena[] = [
     seals: ['SIGLO XIX', '1938'],
   },
   {
-    id: 'a5_kant', acto: 5, layout: 'cards', bg: 'bg_salon', vivo: true,
+    id: 'a5_kant', jug: 'lente', acto: 5, layout: 'cards', bg: 'bg_salon', vivo: true,
     kicker: 'Acto V · Primera lente', title: 'KANT',
     statement: '¿Actuaste según un principio que aceptarías para todos? ¿Trataste a alguien solo como instrumento?',
     cards: [{ img: 'kant', tag: 'Deber y dignidad', name: 'Immanuel Kant', line: 'Devolver una cartera porque es lo correcto, no por la recompensa.' }],
   },
   {
-    id: 'a5_mill', acto: 5, layout: 'cards', bg: 'bg_salon', vivo: true,
+    id: 'a5_mill', jug: 'lente', acto: 5, layout: 'cards', bg: 'bg_salon', vivo: true,
     kicker: 'Acto V · Segunda lente', title: 'BENTHAM Y MILL',
     statement: '¿Qué consecuencias produjeron tus decisiones para el bienestar general?',
     cards: [
@@ -183,7 +216,7 @@ export const ESCENAS: Escena[] = [
     ],
   },
   {
-    id: 'a5_final', acto: 5, layout: 'hero', bg: 'bg_bastille', vivo: true,
+    id: 'a5_final', jug: 'final', acto: 5, layout: 'hero', bg: 'bg_bastille', vivo: true,
     kicker: 'Acto V · Tu final', title: 'TU HISTORIA',
     statement: 'Este es el final que escribieron tus decisiones.',
   },

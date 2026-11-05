@@ -1,284 +1,157 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { FilterDefs, Grain } from '../components/cinema/Grain.tsx'
-import { Laurel } from '../components/cinema/Laurel.tsx'
-import { ESCENAS, PALETAS, img, type Escena } from '../content/escenas.ts'
+import { ESCENAS, img } from '../content/escenas.ts'
+import Deck from '../host/Deck.tsx'
+import { makeDemo } from '../host/demo.ts'
+import { applyArrests, enterScene, publishFates, type HostCreds, type HostCtx } from '../host/ops.ts'
+import { useHostData } from '../hooks/useHostData.ts'
+import { createSession, hostListPending } from '../lib/api.ts'
+import { clearCreds, joinUrlFor, loadCreds, randomCode, saveCreds } from '../lib/hostCreds.ts'
+import { normalizeCode } from '../lib/code.ts'
 
-const EASE = [0.22, 1, 0.36, 1] as const
-const GRADE = 'saturate(.55) contrast(1.12) brightness(.5)'
+const field = 'min-h-12 w-full rounded-lg border border-white/25 bg-black/40 px-4 text-lg text-parchment outline-none focus:border-gold'
+const btn = 'min-h-12 rounded-lg border border-gold/60 px-6 text-lg font-medium text-parchment transition hover:bg-gold/10 disabled:opacity-40'
 
-function Background({ escena }: { escena: Escena }) {
-  const p = PALETAS[escena.acto]
-  return (
-    <motion.div
-      key={escena.id + '-bg'}
-      className="absolute inset-0 overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 1.2, ease: 'easeInOut' }}
-    >
-      {/* Ken Burns: deriva lenta para que la imagen "respire" */}
-      <motion.img
-        src={img(escena.bg)}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-        style={{ filter: GRADE }}
-        initial={{ scale: 1.05, x: '0%' }}
-        animate={{ scale: 1.16, x: '-2%' }}
-        transition={{ duration: 28, ease: 'linear' }}
-      />
-      <div className="absolute inset-0 mix-blend-color" style={{ background: p.tint, opacity: 0.55 }} />
-      <div
-        className="absolute inset-0"
-        style={{ background: `radial-gradient(ellipse at 70% 25%, ${p.glow}33, transparent 55%), linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.15) 40%, rgba(0,0,0,.85))` }}
-      />
-    </motion.div>
-  )
-}
+function Gate({ onReady, onDemo }: { onReady: (c: HostCreds) => void; onDemo: () => void }) {
+  const [code, setCode] = useState(randomCode)
+  const [secret, setSecret] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-const rise = (i: number) => ({
-  initial: { opacity: 0, y: '1.2cqw', filter: 'blur(6px)' },
-  animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
-  transition: { duration: 0.9, delay: 0.25 + i * 0.14, ease: EASE },
-})
-
-const kickerStyle = { fontSize: '0.95cqw', letterSpacing: '0.32em', textTransform: 'uppercase' as const, opacity: 0.8 }
-
-function Title({ text, size }: { text: string; size: string }) {
-  return (
-    <motion.h1
-      {...rise(1)}
-      className="font-display"
-      style={{ fontSize: size, lineHeight: 0.92, color: 'var(--accent)', filter: 'url(#distress)', margin: 0 }}
-    >
-      {text}
-    </motion.h1>
-  )
-}
-
-function Hero({ e }: { e: Escena }) {
-  // Títulos cortos: centrados y enormes. Largos: a la izquierda, para no pisar la cita de la derecha.
-  const long = e.title.length > 18
-  const size = long ? '7.4cqw' : e.title.length > 12 ? '10cqw' : '13cqw'
-  return (
-    <>
-      <div
-        className={long ? 'absolute' : 'absolute inset-x-0 text-center'}
-        style={long ? { top: '9cqw', left: '9cqw', width: '54cqw' } : { top: '8.5cqw' }}
-      >
-        <motion.p {...rise(0)} style={kickerStyle}>{e.kicker}</motion.p>
-        <div style={{ marginTop: '1.2cqw', padding: long ? 0 : '0 10cqw' }}>
-          <Title text={e.title} size={size} />
-        </div>
-      </div>
-      <div className="absolute" style={{ right: '6cqw', bottom: '16cqw', width: '29cqw' }}>
-        {e.statement && (
-          <motion.p {...rise(2)} style={{ fontSize: '1.55cqw', lineHeight: 1.25, textTransform: 'uppercase', color: 'var(--accent)', letterSpacing: '0.03em' }}>
-            “{e.statement}”
-          </motion.p>
-        )}
-        {e.body && <motion.p {...rise(3)} style={{ fontSize: '0.95cqw', lineHeight: 1.5, opacity: 0.75, marginTop: '1cqw' }}>{e.body}</motion.p>}
-        {e.seals && (
-          <motion.div {...rise(4)} className="flex" style={{ gap: '1.4cqw', marginTop: '1.6cqw' }}>
-            {e.seals.map((s) => <Laurel key={s} label={s} />)}
-          </motion.div>
-        )}
-      </div>
-    </>
-  )
-}
-
-function Synopsis({ e }: { e: Escena }) {
-  return (
-    <div className="absolute" style={{ left: '9cqw', top: '14cqw', width: '56cqw' }}>
-      <motion.p {...rise(0)} style={kickerStyle}>{e.kicker}</motion.p>
-      <div style={{ marginTop: '1.6cqw' }}><Title text={e.title} size="5.6cqw" /></div>
-      {e.statement && (
-        <motion.p
-          {...rise(2)}
-          style={{ fontSize: e.statement.length > 110 ? '1.6cqw' : '2.2cqw', lineHeight: 1.25, fontWeight: 600, textTransform: 'uppercase', marginTop: '2.2cqw' }}
-        >
-          {e.statement}
-        </motion.p>
-      )}
-      {e.body && (
-        <motion.div {...rise(3)} style={{ marginTop: '2cqw', paddingLeft: '1.4cqw', borderLeft: '2px solid var(--accent)', maxWidth: '40cqw' }}>
-          <p style={{ fontSize: '1.2cqw', lineHeight: 1.6, opacity: 0.85, margin: 0 }}>{e.body}</p>
-        </motion.div>
-      )}
-    </div>
-  )
-}
-
-function CardView({ c, i, big }: { c: NonNullable<Escena['cards']>[number]; i: number; big: boolean }) {
-  return (
-    <motion.figure
-      {...rise(2 + i)}
-      className="m-0 flex flex-col"
-      style={{ flex: big ? '0 0 21cqw' : 1, minWidth: 0 }}
-    >
-      <div className="overflow-hidden" style={{ aspectRatio: '4 / 5', border: '1px solid rgba(255,255,255,.14)' }}>
-        <motion.img
-          src={img(c.img)}
-          alt={c.name}
-          className="h-full w-full object-cover"
-          style={{ filter: 'saturate(.8) contrast(1.05)' }}
-          initial={{ scale: 1.12 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 2.2, ease: EASE }}
-        />
-      </div>
-      <figcaption style={{ marginTop: '0.9cqw' }}>
-        <span style={{ fontSize: '0.7cqw', letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.65, border: '1px solid rgba(255,255,255,.3)', padding: '0.15cqw 0.5cqw' }}>
-          {c.tag}
-        </span>
-        <p style={{ fontSize: big ? '1.7cqw' : '1.25cqw', fontWeight: 600, textTransform: 'uppercase', margin: '0.7cqw 0 0.3cqw' }}>{c.name}</p>
-        <p style={{ fontSize: big ? '1.05cqw' : '0.85cqw', lineHeight: 1.45, opacity: 0.75, margin: 0 }}>{c.line}</p>
-      </figcaption>
-    </motion.figure>
-  )
-}
-
-function Cards({ e }: { e: Escena }) {
-  const cards = e.cards ?? []
-  if (cards.length <= 2) {
-    return (
-      <div className="absolute flex items-start justify-between" style={{ left: '9cqw', right: '9cqw', top: '11cqw' }}>
-        <div style={{ width: '38cqw', paddingTop: '2cqw' }}>
-          <motion.p {...rise(0)} style={kickerStyle}>{e.kicker}</motion.p>
-          <div style={{ marginTop: '1.6cqw' }}><Title text={e.title} size="6cqw" /></div>
-          {e.statement && (
-            <motion.p {...rise(2)} style={{ fontSize: '1.7cqw', lineHeight: 1.3, marginTop: '2cqw', opacity: 0.9 }}>{e.statement}</motion.p>
-          )}
-        </div>
-        <div className="flex" style={{ gap: '2cqw' }}>
-          {cards.map((c, i) => <CardView key={c.name} c={c} i={i} big />)}
-        </div>
-      </div>
-    )
+  async function create() {
+    setBusy(true); setError(null)
+    const c = normalizeCode(code)
+    if (!c) { setError('El código debe tener 4–6 letras o números.'); setBusy(false); return }
+    try {
+      await createSession(c, secret)
+      onReady({ code: c, secret })
+    } catch (e) {
+      const m = e instanceof Error ? e.message : ''
+      setError(m.includes('duplicate') ? 'Ese código ya existe. Si es tu sala, usa “Reanudar”.' : m.includes('too_short') ? 'La contraseña debe tener al menos 6 caracteres.' : 'No se pudo crear la sala: ' + m)
+    } finally { setBusy(false) }
   }
+  async function resume() {
+    setBusy(true); setError(null)
+    const c = normalizeCode(code)
+    if (!c) { setError('Código inválido.'); setBusy(false); return }
+    try {
+      await hostListPending(c, secret) // verifica el secreto sin cambiar nada
+      onReady({ code: c, secret })
+    } catch { setError('Código o contraseña incorrectos.') } finally { setBusy(false) }
+  }
+
   return (
-    <div className="absolute" style={{ left: '7cqw', right: '7cqw', top: '7.5cqw' }}>
-      <motion.p {...rise(0)} style={kickerStyle}>{e.kicker}</motion.p>
-      <div style={{ margin: '1cqw 0 2cqw' }}><Title text={e.title} size="4.2cqw" /></div>
-      <div className="flex" style={{ gap: '1.4cqw' }}>
-        {cards.map((c, i) => <CardView key={c.name} c={c} i={i} big={false} />)}
+    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-4 px-4">
+      <h1 className="font-serif text-5xl font-bold text-gold">Presentar</h1>
+      <p className="text-parchment/70">Crea una sala y proyecta el QR. La contraseña solo la sabes tú; sirve para controlar la presentación.</p>
+      <label className="text-sm uppercase tracking-widest text-parchment/60">Código de sala
+        <input className={field + ' mt-1 uppercase tracking-widest'} value={code} maxLength={6} onChange={(e) => setCode(e.target.value.toUpperCase())} />
+      </label>
+      <label className="text-sm uppercase tracking-widest text-parchment/60">Contraseña de host
+        <input className={field + ' mt-1'} type="password" autoComplete="off" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="mínimo 6 caracteres" />
+      </label>
+      {error && <p role="alert" className="text-red-300">{error}</p>}
+      <div className="flex gap-3">
+        <button className={btn + ' flex-1'} disabled={busy || secret.length < 6} onClick={() => void create()}>Crear sala</button>
+        <button className={btn + ' flex-1'} disabled={busy || secret.length < 6} onClick={() => void resume()}>Reanudar</button>
       </div>
-    </div>
+      <button className="min-h-12 text-parchment/60 underline" onClick={onDemo}>Modo sin celulares (datos simulados)</button>
+    </main>
   )
 }
 
-function Strip({ index, go }: { index: number; go: (i: number) => void }) {
-  const items = [-2, -1, 0, 1, 2].map((d) => ({ d, i: index + d })).filter(({ i }) => i >= 0 && i < ESCENAS.length)
-  return (
-    <div className="absolute inset-x-0 z-10 flex items-end justify-center" style={{ bottom: '2.2cqw', gap: '0.8cqw' }}>
-      {items.map(({ d, i }) => {
-        const s = ESCENAS[i]
-        const active = d === 0
-        return (
-          <motion.button
-            key={s.id}
-            layout
-            onClick={() => go(i)}
-            className="relative cursor-pointer overflow-hidden border-0 p-0 text-left"
-            style={{ width: active ? '15cqw' : '9cqw', height: active ? '6.6cqw' : '5cqw', opacity: active ? 1 : 0.5, outline: active ? '1px solid var(--accent)' : 'none' }}
-            transition={{ duration: 0.7, ease: EASE }}
-          >
-            <img src={img(s.bg)} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ filter: GRADE }} />
-            <span className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,.85), transparent)' }} />
-            <span className="absolute" style={{ left: '0.6cqw', bottom: '0.45cqw', right: '0.4cqw', color: '#fff', fontSize: active ? '0.75cqw' : '0.6cqw', fontWeight: 600, textTransform: 'uppercase', lineHeight: 1.15 }}>
-              {s.title}
-            </span>
-          </motion.button>
-        )
-      })}
-    </div>
-  )
-}
-
-export default function Presentar() {
+function Live({ creds, demo, onExit }: { creds: HostCreds | null; demo: boolean; onExit: () => void }) {
   const [params, setParams] = useSearchParams()
-  const found = ESCENAS.findIndex((s) => s.id === params.get('s'))
-  const index = found >= 0 ? found : 0
-  const e = ESCENAS[index]
-  const p = PALETAS[e.acto]
+  const real = useHostData(demo ? null : creds?.code ?? null)
+  const demoData = useMemo(() => (demo ? makeDemo() : null), [demo])
+  const [toast, setToast] = useState<string | null>(null)
+  const [localIdx, setLocalIdx] = useState<number | null>(null)
+  const working = useRef(false)
 
-  const go = useCallback(
-    (i: number) => {
-      const j = Math.max(0, Math.min(ESCENAS.length - 1, i))
-      setParams({ s: ESCENAS[j].id }, { replace: true })
-    },
-    [setParams],
-  )
+  const data = demoData ?? { session: real.session, players: real.players, decisions: real.decisions, posts: real.posts }
+  const sessionIdx = demo
+    ? Math.max(0, ESCENAS.findIndex((s) => s.id === params.get('s')))
+    : Math.max(0, ESCENAS.findIndex((s) => s.id === real.session?.scene))
+  const index = !demo && localIdx !== null ? localIdx : sessionIdx
+
+  const say = useCallback((m: string) => { setToast(m); setTimeout(() => setToast((t) => (t === m ? null : t)), 3200) }, [])
+  const ctx = useCallback((): HostCtx | null => (!demo && creds && real.session ? { ...creds, session: real.session, players: real.players, decisions: real.decisions, posts: real.posts } : null), [demo, creds, real.session, real.players, real.decisions, real.posts])
+
+  useEffect(() => { if (localIdx !== null && localIdx === sessionIdx) setLocalIdx(null) }, [localIdx, sessionIdx])
+
+  const go = useCallback(async (i: number) => {
+    const j = Math.max(0, Math.min(ESCENAS.length - 1, i))
+    if (demo) { setParams({ s: ESCENAS[j].id }, { replace: true }); return }
+    const c = ctx()
+    if (!c || working.current) return
+    working.current = true
+    setLocalIdx(j)
+    try { await enterScene(c, ESCENAS[j].id); await real.refresh() } catch (e) { setLocalIdx(null); say('Error: ' + (e instanceof Error ? e.message : '')) } finally { working.current = false }
+  }, [demo, ctx, real, say, setParams])
+
+  const doAction = useCallback(async (kind: 'arrestos' | 'destinos' | 'rey') => {
+    const scene = ESCENAS[index].id
+    if (demo) { say('Modo simulado: los resultados ya están calculados'); return }
+    const c = ctx()
+    if (!c) return
+    try {
+      if (kind === 'arrestos' && scene === 'a3_danton') say(`Arrestos por azar del sistema: ${await applyArrests(c)}`)
+      else if (kind === 'destinos' && (scene === 'a3_tribunal_garantias' || scene === 'a3_tribunal_sin_garantias')) {
+        const r = await publishFates(c); say(`Destinos publicados · absueltos ${r.absueltos} · condenados ${r.condenados}`)
+      } else if (kind === 'rey' && scene === 'a2_rey') { await enterScene(c, 'a2_rey', true); say('Nuevo “rey” sorteado') }
+      else say('Esa acción no aplica a esta escena')
+      await real.refresh()
+    } catch (e) { say('Error: ' + (e instanceof Error ? e.message : '')) }
+  }, [index, demo, ctx, real, say])
 
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
-      if (ev.key === 'ArrowRight' || ev.key === ' ' || ev.key === 'PageDown') { ev.preventDefault(); go(index + 1) }
-      else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { go(index - 1) }
-      else if (ev.key.toLowerCase() === 'f') {
+      if ((ev.target as HTMLElement).tagName === 'INPUT') return
+      const k = ev.key.toLowerCase()
+      if (ev.key === 'ArrowRight' || ev.key === ' ' || ev.key === 'PageDown') { ev.preventDefault(); void go(index + 1) }
+      else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') void go(index - 1)
+      else if (k === 'a') void doAction('arrestos')
+      else if (k === 'f') void doAction('destinos')
+      else if (k === 'r') void doAction('rey')
+      else if (k === 'm' || k === 'k') window.open(location.pathname + '#/moderar', '_blank')
+      else if (k === 'p') {
         if (document.fullscreenElement) void document.exitFullscreen()
         else void document.documentElement.requestFullscreen()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [go, index])
+  }, [go, doAction, index])
 
-  // Precarga la siguiente imagen para que el cambio de escena sea instantáneo.
-  useEffect(() => {
-    const next = ESCENAS[index + 1]
-    if (next) new Image().src = img(next.bg)
-  }, [index])
+  // Precarga la imagen de la siguiente escena: el cambio es instantáneo.
+  useEffect(() => { const n = ESCENAS[index + 1]; if (n) new Image().src = img(n.bg) }, [index])
 
+  if (!demo && !real.session) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-4 text-center">
+        <p className="text-xl text-parchment/80">{real.error ? 'Sin conexión con la sala…' : 'Conectando con la sala…'}</p>
+        <button className="text-parchment/60 underline" onClick={onExit}>Volver</button>
+      </main>
+    )
+  }
+  const session = data.session!
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black">
-      <FilterDefs />
-      <div
-        className="relative overflow-hidden"
-        style={{ aspectRatio: '16 / 9', width: 'min(100vw, calc(100vh * 16 / 9))', containerType: 'size', ['--accent' as string]: p.accent, color: '#f3ece0', background: '#050505' }}
-      >
-        <AnimatePresence>
-          <Background key={e.id + '-bg'} escena={e} />
-        </AnimatePresence>
-        <Grain />
-
-        {/* Barra superior, como el menú de un sitio de cine */}
-        <header
-          className="absolute inset-x-0 top-0 z-10 flex items-center justify-between"
-          style={{ padding: '1.6cqw 3cqw 3.4cqw', fontSize: '0.8cqw', letterSpacing: '0.2em', textTransform: 'uppercase', background: 'linear-gradient(to bottom, rgba(0,0,0,.72), transparent)' }}
-        >
-          <span style={{ fontWeight: 600 }}>Citoyen</span>
-          <nav className="flex" style={{ gap: '2.4cqw' }}>
-            {([1, 2, 3, 4, 5] as const).map((a) => (
-              <span key={a} style={{ opacity: a === e.acto ? 1 : 0.4, color: a === e.acto ? 'var(--accent)' : undefined, transition: 'opacity .6s' }}>
-                {PALETAS[a].numeral} · {PALETAS[a].name}
-              </span>
-            ))}
-          </nav>
-          <span style={{ border: '1px solid rgba(255,255,255,.5)', padding: '0.4cqw 1.2cqw' }}>
-            {String(index + 1).padStart(2, '0')} / {ESCENAS.length}
-          </span>
-        </header>
-
-        <AnimatePresence mode="wait">
-          <motion.div key={e.id} className="absolute inset-0 z-10" exit={{ opacity: 0, filter: 'blur(8px)' }} transition={{ duration: 0.45 }}>
-            {e.layout === 'hero' && <Hero e={e} />}
-            {e.layout === 'synopsis' && <Synopsis e={e} />}
-            {e.layout === 'cards' && <Cards e={e} />}
-            {e.vivo && (
-              <motion.span {...rise(5)} className="absolute flex items-center" style={{ right: '3cqw', top: '4.6cqw', gap: '0.5cqw', fontSize: '0.75cqw', letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.8 }}>
-                <i className="inline-block rounded-full" style={{ width: '0.55cqw', height: '0.55cqw', background: '#e5484d', animation: 'pulse 1.6s infinite' }} />
-                Responden en el celular
-              </motion.span>
-            )}
-          </motion.div>
-        </AnimatePresence>
-
-        <Strip index={index} go={go} />
-        <div className="absolute bottom-0 left-0 z-20 h-[3px]" style={{ width: `${((index + 1) / ESCENAS.length) * 100}%`, background: 'var(--accent)', transition: 'width .8s cubic-bezier(.22,1,.36,1)' }} />
-      </div>
-    </div>
+    <Deck
+      index={index} go={(i) => void go(i)} demo={demo} toast={toast}
+      offline={!demo && !!real.error}
+      joinUrl={demo ? undefined : joinUrlFor(session.code)}
+      data={{ session, players: data.players, decisions: data.decisions, posts: data.posts }}
+    />
   )
+}
+
+export default function Presentar() {
+  const [params] = useSearchParams()
+  const [creds, setCreds] = useState<HostCreds | null>(loadCreds)
+  const [demo, setDemo] = useState(params.get('demo') === '1')
+
+  if (!creds && !demo) {
+    return <Gate onReady={(c) => { saveCreds(c); setCreds(c) }} onDemo={() => setDemo(true)} />
+  }
+  return <Live creds={creds} demo={demo} onExit={() => { clearCreds(); setCreds(null); setDemo(false) }} />
 }

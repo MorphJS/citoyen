@@ -11,11 +11,14 @@
     "test": "vitest run",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "smoke": "node --env-file=.env.local scripts/smoke.mjs"
+    "smoke": "node --env-file=.env.local scripts/smoke.mjs",
+    "load": "node --env-file=.env.local scripts/load.mjs",
+    "e2e": "node --env-file=.env.local scripts/e2e.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
     "framer-motion": "^14.9.1",
+    "html-to-image": "^1.11.13",
     "qrcode.react": "^4.2.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -29,6 +32,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "gh-pages": "^6.3.0",
     "oxlint": "^1.90.0",
+    "puppeteer-core": "^25.16.0",
     "tailwindcss": "^4.3.4",
     "typescript": "~7.0.2",
     "vite": "^8.3.6",
