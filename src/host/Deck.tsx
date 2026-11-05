@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { QRCodeSVG } from 'qrcode.react'
 import { FilterDefs, Grain } from '../components/cinema/Grain.tsx'
-import { Laurel } from '../components/cinema/Laurel.tsx'
 import { ESCENAS, PALETAS, img, type Escena } from '../content/escenas.ts'
+import { hashSeed } from '../game/rng.ts'
 import type { DemoData } from './demo.ts'
+import { BigWord, DateLayout, Duel, EASE, Filmstrip, Lower, Poster, QuoteLayout, Split, Timeline, Title, Triptych, kickerStyle, panel, rise } from './layouts.tsx'
 import { contar, debrief, porVariante, respondieron, reyVsGrupos } from './stats.ts'
 
-const EASE = [0.22, 1, 0.36, 1] as const
 const GRADE = 'saturate(.55) contrast(1.12) brightness(.5)'
 
 export type DeckData = Pick<DemoData, 'session' | 'players' | 'decisions' | 'posts'>
@@ -20,33 +20,24 @@ export type DeckProps = {
   offline?: boolean
 }
 
-function Background({ escena }: { escena: Escena }) {
+function Background({ escena, vivid }: { escena: Escena; vivid?: boolean }) {
   const p = PALETAS[escena.acto]
+  const [fx, fy] = escena.foco ?? [50, 50]
+  const z = escena.zoom ?? 1.1
+  // Cada escena enseña una parte distinta de la imagen y la cámara se mueve en una dirección distinta.
+  const h = hashSeed(escena.id)
+  const zoomIn = h % 2 === 0
+  const drift = ((h >> 1) % 3) - 1 // -1, 0, 1
   return (
-    <motion.div className="absolute inset-0 overflow-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1.2, ease: 'easeInOut' }}>
+    <motion.div className="absolute inset-0 overflow-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1.2, ease: "easeInOut" }}>
       <motion.img
-        src={img(escena.bg)} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ filter: GRADE }}
-        initial={{ scale: 1.05, x: '0%' }} animate={{ scale: 1.16, x: '-2%' }} transition={{ duration: 28, ease: 'linear' }}
+        src={img(escena.bg)} alt="" className="absolute inset-0 h-full w-full object-cover"
+        style={{ filter: vivid ? "saturate(.7) contrast(1.1) brightness(.72)" : GRADE, objectPosition: `${fx}% ${fy}%`, transformOrigin: `${fx}% ${fy}%` }}
+        initial={{ scale: zoomIn ? z : z * 1.12, x: `${-drift}%` }} animate={{ scale: zoomIn ? z * 1.12 : z, x: `${drift}%` }} transition={{ duration: 30, ease: "linear" }}
       />
-      <div className="absolute inset-0 mix-blend-color" style={{ background: p.tint, opacity: 0.55 }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 70% 25%, ${p.glow}33, transparent 55%), linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.15) 40%, rgba(0,0,0,.85))` }} />
+      <div className="absolute inset-0 mix-blend-color" style={{ background: p.tint, opacity: vivid ? 0.4 : 0.55 }} />
+      <div className="absolute inset-0" style={{ background: vivid ? `linear-gradient(to bottom, rgba(0,0,0,.4), rgba(0,0,0,.05) 35%, rgba(0,0,0,.8))` : `radial-gradient(ellipse at 70% 25%, ${p.glow}33, transparent 55%), linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.15) 40%, rgba(0,0,0,.85))` }} />
     </motion.div>
-  )
-}
-
-const rise = (i: number) => ({
-  initial: { opacity: 0, y: '1.2cqw', filter: 'blur(6px)' },
-  animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
-  transition: { duration: 0.9, delay: 0.25 + i * 0.14, ease: EASE },
-})
-const kickerStyle = { fontSize: '0.95cqw', letterSpacing: '0.32em', textTransform: 'uppercase' as const, opacity: 0.8 }
-const panel = { background: 'rgba(0,0,0,.5)', border: '1px solid rgba(255,255,255,.14)', padding: '1.8cqw', backdropFilter: 'blur(4px)' }
-
-function Title({ text, size }: { text: string; size: string }) {
-  return (
-    <motion.h1 {...rise(1)} className="font-display" style={{ fontSize: size, lineHeight: 0.92, color: 'var(--accent)', filter: 'url(#distress)', margin: 0 }}>
-      {text}
-    </motion.h1>
   )
 }
 
@@ -85,34 +76,9 @@ function LobbyHero({ e, d, joinUrl }: { e: Escena; d: DeckData; joinUrl?: string
   )
 }
 
-function Hero({ e, d, joinUrl }: { e: Escena; d: DeckData; joinUrl?: string }) {
-  if (e.id === 'lobby') return <LobbyHero e={e} d={d} joinUrl={joinUrl} />
-  const long = e.title.length > 18
-  const size = long ? '7.4cqw' : e.title.length > 12 ? '10cqw' : '13cqw'
+function TextColumn({ e, width = '56cqw', left = '9cqw' }: { e: Escena; width?: string; left?: string }) {
   return (
-    <>
-      <div className={long ? 'absolute' : 'absolute inset-x-0 text-center'} style={long ? { top: '9cqw', left: '9cqw', width: '54cqw' } : { top: '8.5cqw' }}>
-        <motion.p {...rise(0)} style={kickerStyle}>{e.kicker}</motion.p>
-        <div style={{ marginTop: '1.2cqw', padding: long ? 0 : '0 10cqw' }}><Title text={e.title} size={size} /></div>
-      </div>
-      <div className="absolute" style={{ right: '6cqw', bottom: '16cqw', width: '29cqw' }}>
-        {e.statement && (
-          <motion.p {...rise(2)} style={{ fontSize: '1.55cqw', lineHeight: 1.25, textTransform: 'uppercase', color: 'var(--accent)', letterSpacing: '0.03em' }}>“{e.statement}”</motion.p>
-        )}
-        {e.body && <motion.p {...rise(3)} style={{ fontSize: '0.95cqw', lineHeight: 1.5, opacity: 0.75, marginTop: '1cqw' }}>{e.body}</motion.p>}
-        {e.seals && (
-          <motion.div {...rise(4)} className="flex" style={{ gap: '1.4cqw', marginTop: '1.6cqw' }}>
-            {e.seals.map((s) => <Laurel key={s} label={s} />)}
-          </motion.div>
-        )}
-      </div>
-    </>
-  )
-}
-
-function TextColumn({ e, width = '56cqw' }: { e: Escena; width?: string }) {
-  return (
-    <div className="absolute" style={{ left: '9cqw', top: '14cqw', width }}>
+    <div className="absolute" style={{ left, top: '14cqw', width }}>
       <motion.p {...rise(0)} style={kickerStyle}>{e.kicker}</motion.p>
       <div style={{ marginTop: '1.6cqw' }}><Title text={e.title} size={e.title.length > 20 ? '4.4cqw' : '5.6cqw'} /></div>
       {e.statement && (
@@ -132,17 +98,17 @@ function TextColumn({ e, width = '56cqw' }: { e: Escena; width?: string }) {
 function Synopsis({ e, d }: { e: Escena; d: DeckData }) {
   return (
     <>
-      <TextColumn e={e} />
-      {e.id === 'a2_rey' && <ReyLive d={d} />}
+      <TextColumn e={e} width={e.lado === 'der' ? '52cqw' : '56cqw'} left={e.lado === 'der' ? '40cqw' : '9cqw'} />
+      {e.id === 'a2_rey' && <ReyLive d={d} der={e.lado === 'der'} />}
     </>
   )
 }
 
 /** Lo que decide el “rey” aparece en el proyector en tiempo real. */
-function ReyLive({ d }: { d: DeckData }) {
+function ReyLive({ d, der }: { d: DeckData; der?: boolean }) {
   const { rey } = reyVsGrupos(d.decisions, d.session.scene_payload)
   return (
-    <motion.div {...rise(4)} className="absolute" style={{ left: '68cqw', top: '14cqw', width: '24cqw', ...panel }}>
+    <motion.div {...rise(4)} className="absolute" style={{ left: der ? '7cqw' : '68cqw', top: '14cqw', width: '26cqw', ...panel }}>
       <p style={{ ...kickerStyle, margin: 0 }}>El “rey” decide</p>
       {rey.map((r) => (
         <div key={r.pregunta} style={{ marginTop: '1.2cqw' }}>
@@ -154,61 +120,23 @@ function ReyLive({ d }: { d: DeckData }) {
   )
 }
 
-type CardT = NonNullable<Escena['cards']>[number]
-function CardView({ c, i, big }: { c: CardT; i: number; big: boolean }) {
-  return (
-    <motion.figure {...rise(2 + i)} className="m-0 flex flex-col" style={{ flex: big ? '0 0 21cqw' : 1, minWidth: 0 }}>
-      <div className="overflow-hidden" style={{ aspectRatio: '4 / 5', border: '1px solid rgba(255,255,255,.14)' }}>
-        <motion.img src={img(c.img)} alt={c.name} className="h-full w-full object-cover" style={{ filter: 'saturate(.8) contrast(1.05)' }} initial={{ scale: 1.12 }} animate={{ scale: 1 }} transition={{ duration: 2.2, ease: EASE }} />
-      </div>
-      <figcaption style={{ marginTop: '0.9cqw' }}>
-        <span style={{ fontSize: '0.7cqw', letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.65, border: '1px solid rgba(255,255,255,.3)', padding: '0.15cqw 0.5cqw' }}>{c.tag}</span>
-        <p style={{ fontSize: big ? '1.7cqw' : '1.25cqw', fontWeight: 600, textTransform: 'uppercase', margin: '0.7cqw 0 0.3cqw' }}>{c.name}</p>
-        <p style={{ fontSize: big ? '1.05cqw' : '0.85cqw', lineHeight: 1.45, opacity: 0.75, margin: 0 }}>{c.line}</p>
-      </figcaption>
-    </motion.figure>
-  )
-}
-
 /** Textos del Cordelier YA aprobados (nada pendiente llega aquí: la tabla solo expone approved). */
 function PostWall({ d }: { d: DeckData }) {
   const posts = d.posts.filter((p) => p.scene === 'a3_cordelier' && p.status === 'approved').slice(-4)
   return (
-    <div className="flex flex-col" style={{ width: '31cqw', gap: '1.2cqw' }}>
-      <p style={{ ...kickerStyle, margin: 0 }}>Le Vieux Cordelier · textos aprobados</p>
+    <div style={{ marginTop: '1.4cqw' }}>
+      <p style={{ ...kickerStyle, margin: '0 0 0.8cqw' }}>Textos aprobados · sin nombre</p>
+      <div className="grid grid-cols-2" style={{ gap: '1cqw' }}>
       <AnimatePresence>
         {posts.map((p) => (
           <motion.blockquote key={p.id} initial={{ opacity: 0, y: '1cqw' }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: EASE }}
-            style={{ margin: 0, padding: '1.2cqw 1.4cqw', background: 'rgba(243,233,210,.92)', color: '#2a2118', fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: '1.45cqw', lineHeight: 1.25, fontStyle: 'italic' }}>
+            style={{ margin: 0, padding: '0.8cqw 1cqw', background: 'rgba(243,233,210,.92)', color: '#2a2118', fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: '1.1cqw', lineHeight: 1.25, fontStyle: 'italic' }}>
             “{p.body}”
-            <footer style={{ fontSize: '0.75cqw', fontStyle: 'normal', fontFamily: 'Inter, sans-serif', opacity: 0.6, marginTop: '0.5cqw' }}>— un ciudadano</footer>
+            <footer style={{ fontSize: '0.65cqw', fontStyle: 'normal', fontFamily: 'Inter, sans-serif', opacity: 0.6, marginTop: '0.5cqw' }}>— un ciudadano</footer>
           </motion.blockquote>
         ))}
       </AnimatePresence>
-    </div>
-  )
-}
-
-function Cards({ e, d }: { e: Escena; d: DeckData }) {
-  const cards = e.cards ?? []
-  if (cards.length <= 2) {
-    const wall = e.id === 'a3_cordelier' && d.posts.some((p) => p.scene === 'a3_cordelier' && p.status === 'approved')
-    return (
-      <div className="absolute flex items-start justify-between" style={{ left: '9cqw', right: '9cqw', top: '11cqw' }}>
-        <div style={{ width: '38cqw', paddingTop: '2cqw' }}>
-          <motion.p {...rise(0)} style={kickerStyle}>{e.kicker}</motion.p>
-          <div style={{ marginTop: '1.6cqw' }}><Title text={e.title} size="6cqw" /></div>
-          {e.statement && <motion.p {...rise(2)} style={{ fontSize: '1.7cqw', lineHeight: 1.3, marginTop: '2cqw', opacity: 0.9 }}>{e.statement}</motion.p>}
-        </div>
-        {wall ? <PostWall d={d} /> : <div className="flex" style={{ gap: '2cqw' }}>{cards.map((c, i) => <CardView key={c.name} c={c} i={i} big />)}</div>}
       </div>
-    )
-  }
-  return (
-    <div className="absolute" style={{ left: '7cqw', right: '7cqw', top: '7.5cqw' }}>
-      <motion.p {...rise(0)} style={kickerStyle}>{e.kicker}</motion.p>
-      <div style={{ margin: '1cqw 0 2cqw' }}><Title text={e.title} size="4.2cqw" /></div>
-      <div className="flex" style={{ gap: '1.4cqw' }}>{cards.map((c, i) => <CardView key={c.name} c={c} i={i} big={false} />)}</div>
     </div>
   )
 }
@@ -230,8 +158,8 @@ function Results({ e, d }: { e: Escena; d: DeckData }) {
   const r = e.resultados
   return (
     <>
-      <TextColumn e={e} width="44cqw" />
-      <motion.div {...rise(3)} className="absolute" style={{ left: '57cqw', top: '12cqw', width: '35cqw', ...panel }}>
+      <TextColumn e={e} width="42cqw" left={e.lado === 'izq' ? '50cqw' : '9cqw'} />
+      <motion.div {...rise(3)} className="absolute" style={{ left: e.lado === 'izq' ? '7cqw' : '57cqw', top: '12cqw', width: '35cqw', ...panel }}>
         {r?.tipo === 'barras' && (
           <>
             {r.barras.map((b) => {
@@ -314,7 +242,7 @@ function Strip({ index, go }: { index: number; go: (i: number) => void }) {
           <motion.button key={s.id} layout onClick={() => go(i)} className="relative cursor-pointer overflow-hidden border-0 p-0 text-left"
             style={{ width: active ? '15cqw' : '9cqw', height: active ? '6.6cqw' : '5cqw', opacity: active ? 1 : 0.5, outline: active ? '1px solid var(--accent)' : 'none' }}
             transition={{ duration: 0.7, ease: EASE }}>
-            <img src={img(s.bg)} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ filter: GRADE }} />
+            <img src={img(s.bg)} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ filter: GRADE, objectPosition: `${(s.foco ?? [50, 50])[0]}% ${(s.foco ?? [50, 50])[1]}%`, transform: `scale(${s.zoom ?? 1})` }} />
             <span className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,.85), transparent)' }} />
             <span className="absolute" style={{ left: '0.6cqw', bottom: '0.45cqw', right: '0.4cqw', color: '#fff', fontSize: active ? '0.75cqw' : '0.6cqw', fontWeight: 600, textTransform: 'uppercase', lineHeight: 1.15 }}>{s.title}</span>
           </motion.button>
@@ -333,9 +261,9 @@ export default function Deck({ index, go, data, demo, joinUrl, toast, offline }:
     <div className="fixed inset-0 flex items-center justify-center bg-black">
       <FilterDefs />
       <div className="relative overflow-hidden" style={{ aspectRatio: '16 / 9', width: 'min(100vw, calc(100vh * 16 / 9))', containerType: 'size', ['--accent' as string]: p.accent, color: '#f3ece0', background: '#050505' }}>
-        <AnimatePresence><Background key={e.id + '-bg'} escena={e} /></AnimatePresence>
+        <AnimatePresence><Background key={e.id + '-bg'} escena={e} vivid={e.layout === 'poster' || e.layout === 'lower'} /></AnimatePresence>
         <Grain />
-        <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between" style={{ padding: '1.6cqw 3cqw 3.4cqw', fontSize: '0.8cqw', letterSpacing: '0.2em', textTransform: 'uppercase', background: 'linear-gradient(to bottom, rgba(0,0,0,.72), transparent)' }}>
+        <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between" style={{ padding: '1.6cqw 3cqw 3.4cqw', fontSize: '0.8cqw', letterSpacing: '0.2em', textTransform: 'uppercase', background: 'linear-gradient(to bottom, rgba(0,0,0,.72), transparent)' }}>
           <span style={{ fontWeight: 600 }}>Citoyen</span>
           <nav className="flex" style={{ gap: '2.4cqw' }}>
             {([1, 2, 3, 4, 5] as const).map((a) => (
@@ -345,16 +273,25 @@ export default function Deck({ index, go, data, demo, joinUrl, toast, offline }:
           <span style={{ border: '1px solid rgba(255,255,255,.5)', padding: '0.4cqw 1.2cqw' }}>{String(index + 1).padStart(2, '0')} / {ESCENAS.length}</span>
         </header>
         {(demo || offline) && (
-          <span className="absolute z-10" style={{ left: '3cqw', top: '4.4cqw', fontSize: '0.7cqw', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#e8a73a' }}>
+          <span className="absolute z-20" style={{ left: '3cqw', top: '4.4cqw', fontSize: '0.7cqw', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#e8a73a' }}>
             {demo ? 'Datos simulados · modo sin celulares' : 'Sin conexión con la sala'}
           </span>
         )}
         <AnimatePresence mode="wait">
           <motion.div key={e.id} className="absolute inset-0 z-10" exit={{ opacity: 0, filter: 'blur(8px)' }} transition={{ duration: 0.45 }}>
-            {e.layout === 'hero' && <Hero e={e} d={data} joinUrl={joinUrl} />}
+            {e.layout === 'hero' && <LobbyHero e={e} d={data} joinUrl={joinUrl} />}
             {e.layout === 'synopsis' && <Synopsis e={e} d={data} />}
-            {e.layout === 'cards' && <Cards e={e} d={data} />}
             {e.layout === 'results' && <Results e={e} d={data} />}
+            {e.layout === 'poster' && <Poster e={e} />}
+            {e.layout === 'date' && <DateLayout e={e} />}
+            {e.layout === 'quote' && <QuoteLayout e={e} />}
+            {e.layout === 'split' && <Split e={e} extra={e.id === 'a3_cordelier' && data.posts.some((p) => p.scene === 'a3_cordelier' && p.status === 'approved') ? <PostWall d={data} /> : undefined} />}
+            {e.layout === 'duel' && <Duel e={e} />}
+            {e.layout === 'lower' && <Lower e={e} />}
+            {e.layout === 'triptych' && <Triptych e={e} />}
+            {e.layout === 'timeline' && <Timeline e={e} />}
+            {e.layout === 'bigword' && <BigWord e={e} />}
+            {e.layout === 'filmstrip' && <Filmstrip e={e} />}
             {e.vivo && (
               <motion.span {...rise(5)} className="absolute flex items-center" style={{ right: '3cqw', top: '4.6cqw', gap: '0.5cqw', fontSize: '0.75cqw', letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.85 }}>
                 <i className="inline-block rounded-full" style={{ width: '0.55cqw', height: '0.55cqw', background: '#e5484d', animation: 'pulse 1.6s infinite' }} />

@@ -31,8 +31,9 @@ if (process.argv[2] === '--search') {
 const IMAGES = JSON.parse(process.env.IMAGES_JSON ?? 'null') ?? (await import('./images.json', { with: { type: 'json' } })).default
 
 await mkdir('public/img', { recursive: true })
-const credits = {}
+const credits = process.env.ONLY ? JSON.parse((await import('node:fs')).readFileSync('public/img/CREDITS.json', 'utf8')) : {}
 for (const [key, { title, width = 1600 }] of Object.entries(IMAGES)) {
+  if (process.env.ONLY && !process.env.ONLY.split(',').includes(key)) continue
   const j = await api({
     action: 'query', titles: title, prop: 'imageinfo', iiprop: 'url|extmetadata', iiurlwidth: width,
   })
