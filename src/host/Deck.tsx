@@ -5,12 +5,14 @@ import { ESCENAS, PALETAS, img, type Escena } from '../content/escenas.ts'
 import { hashSeed } from '../game/rng.ts'
 import type { DemoData } from './demo.ts'
 import { BigWord, DateLayout, Duel, EASE, Filmstrip, Lower, Poster, QuoteLayout, Split, Timeline, Title, Triptych, kickerStyle, panel, rise } from './layouts.tsx'
+import { DEBATE, VERDAD_A1, VEREDICTO_TXT } from '../content/historias.ts'
 import { contar, debrief, porVariante, respondieron, reyVsGrupos } from './stats.ts'
 
 const GRADE = 'saturate(.55) contrast(1.12) brightness(.5)'
 
 export type DeckData = Pick<DemoData, 'session' | 'players' | 'decisions' | 'posts'>
 export type DeckProps = {
+  debate?: boolean
   index: number
   go: (i: number) => void
   data: DeckData
@@ -180,6 +182,7 @@ function Results({ e, d }: { e: Escena; d: DeckData }) {
                     <div key={x.v} style={{ flex: 1 }}>
                       <b style={{ fontSize: '1.6cqw', color: 'var(--accent)' }}>{x.pct}%</b>
                       <p style={{ margin: 0, opacity: 0.7 }}>{{ A: 'Firma importante', B: 'Anónimo con fuente', C: 'En disputa' }[x.v]}</p>
+                      {<p style={{ margin: '0.3cqw 0 0', fontSize: '0.7cqw', letterSpacing: '0.12em', textTransform: 'uppercase', color: VERDAD_A1[x.v] === 'cierto' ? '#8fd19e' : VERDAD_A1[x.v] === 'falso' ? '#e98a7e' : '#e8c26a' }}>{VEREDICTO_TXT[VERDAD_A1[x.v]].titulo.replace('El panfleto ', '')}</p>}
                     </div>
                   ))}
                 </div>
@@ -252,7 +255,7 @@ function Strip({ index, go }: { index: number; go: (i: number) => void }) {
   )
 }
 
-export default function Deck({ index, go, data, demo, joinUrl, toast, offline }: DeckProps) {
+export default function Deck({ index, go, data, demo, joinUrl, toast, offline, debate }: DeckProps) {
   const e = ESCENAS[index]
   const p = PALETAS[e.acto]
   const activos = data.players.filter((x) => x.status === 'active').length
@@ -306,6 +309,15 @@ export default function Deck({ index, go, data, demo, joinUrl, toast, offline }:
               style={{ left: '50%', top: '5.5cqw', transform: 'translateX(-50%)', background: 'rgba(0,0,0,.8)', border: '1px solid var(--accent)', padding: '0.6cqw 1.6cqw', fontSize: '0.95cqw' }}>
               {toast}
             </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {debate && DEBATE[e.id] && (
+            <motion.aside key="debate" initial={{ opacity: 0, y: '2cqw' }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease: EASE }}
+              className="absolute z-30" style={{ left: '8cqw', right: '8cqw', bottom: '9.5cqw', background: 'rgba(8,6,4,.985)', border: '1px solid var(--accent)', boxShadow: '0 0 0 100vmax rgba(0,0,0,.55)', padding: '1.8cqw 2.4cqw' }}>
+              <p style={{ ...kickerStyle, margin: '0 0 1cqw', color: 'var(--accent)' }}>Para debatir · tecla D para cerrar</p>
+              {DEBATE[e.id].map((q) => <p key={q} style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2cqw', lineHeight: 1.25, margin: '0 0 0.7cqw' }}>• {q}</p>)}
+            </motion.aside>
           )}
         </AnimatePresence>
         <Strip index={index} go={go} />

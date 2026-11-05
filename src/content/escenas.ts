@@ -38,7 +38,7 @@ export const PALETAS: Record<Acto, Palette> = {
 export type Card = { img: ImgKey; tag: string; name: string; line: string }
 
 /** Qué hace el celular en la escena. 'mira' = solo observar el proyector. */
-export type Jug = 'lobby' | 'prompt' | 'rey' | 'grupo' | 'cordelier' | 'danton' | 'tribunal1' | 'pradial' | 'tribunal2' | 'lente' | 'final' | 'mira'
+export type Jug = 'verdad' | 'resumen' | 'lobby' | 'prompt' | 'rey' | 'grupo' | 'cordelier' | 'danton' | 'tribunal1' | 'pradial' | 'tribunal2' | 'lente' | 'final' | 'mira'
 
 export type Barra = { titulo?: string; scene: string; prompt: string }
 /** Resultados agregados del proyector (nunca quién votó qué). */
@@ -89,7 +89,7 @@ export const ESCENAS: Escena[] = [
     body: 'La razón, la educación y la ciencia permitían comprender el mundo y mejorar la sociedad.',
   },
   {
-    id: 'a1_rumor_resultados', acto: 1, layout: 'results', lado: 'izq', foco: [78,55], zoom: 1.4, bg: 'bg_salon',
+    id: 'a1_rumor_resultados', jug: 'verdad', acto: 1, layout: 'results', lado: 'izq', foco: [78,55], zoom: 1.4, bg: 'bg_salon',
     kicker: 'Acto I · Resultado', title: '¿QUÉ HICIMOS CON EL PANFLETO?',
     statement: 'Comprobar una afirmación antes de creerla, en lugar de aceptarla solo porque la dijo alguien importante.',
     resultados: { tipo: 'barras', porVariante: true, barras: [{ scene: 'a1_rumor', prompt: 'main' }] },
@@ -181,7 +181,7 @@ export const ESCENAS: Escena[] = [
     cards: [{ img: 'robespierre', tag: 'Figura central', name: 'Robespierre', line: 'Fue una figura central, aunque no el único responsable de estas políticas.' }],
   },
   {
-    id: 'a3_resultados', acto: 3, layout: 'results', lado: 'izq', foco: [60,50], zoom: 1.1, bg: 'bg_terror',
+    id: 'a3_resultados', jug: 'resumen', acto: 3, layout: 'results', lado: 'izq', foco: [60,50], zoom: 1.1, bg: 'bg_terror',
     kicker: 'Acto III · Balance', title: 'EL COSTO DEL MIEDO',
     statement: 'El miedo silencia: las personas podían dejar de expresar sus ideas por temor a ser consideradas enemigas.',
     resultados: { tipo: 'debrief' },
@@ -204,7 +204,7 @@ export const ESCENAS: Escena[] = [
     body: 'Eso no significa que una tenga derecho a obligar a la otra.',
   },
   {
-    id: 'a4_resultados', acto: 4, layout: 'results', foco: [50,50], zoom: 1.1, bg: 'bg_nacion',
+    id: 'a4_resultados', jug: 'resumen', acto: 4, layout: 'results', foco: [50,50], zoom: 1.1, bg: 'bg_nacion',
     kicker: 'Acto IV · Resultado', title: '¿HASTA DÓNDE LLEGAMOS?',
     statement: 'Compartir idioma no da derecho a obligar a otra comunidad a unirse a tu país.',
     resultados: { tipo: 'barras', barras: [

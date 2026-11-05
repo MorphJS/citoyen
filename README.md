@@ -7,9 +7,13 @@ Presentación escolar interactiva: cada compañero, desde su celular, vive la hi
 2. Los compañeros escanean el QR del lobby (o entran a `/#/jugar` y escriben el código).
 3. Avanza con **→ / espacio** (← para volver). **P** = pantalla completa.
 4. Abre `/#/moderar` **en otra pestaña o en tu celular** (misma contraseña): aprueba o rechaza textos del Cordelier, expulsa jugadores y controla las escenas como control remoto.
-5. En las escenas del Terror: **A** = arrestos por azar (escena Danton) · **F** = publicar destinos (los dos tribunales) · **R** = re-sortear al “rey”.
-6. **Sin celulares / sin wifi:** en la pantalla de entrada pulsa “Modo sin celulares”. Todas las escenas funcionan con datos simulados, rotulados como tales.
-7. Después: `delete from public.sessions where code = 'TUCODIGO';` en el SQL editor (la cascada borra todo lo de la sala).
+5. **D** abre/cierra preguntas para debatir en la escena actual (léelas en voz alta y deja hablar a la clase).
+6. En las escenas del Terror: **A** = arrestos por azar (escena Danton) · **F** = publicar destinos (los dos tribunales) · **R** = re-sortear al “rey”.
+7. **Sin celulares / sin wifi:** en la pantalla de entrada pulsa “Modo sin celulares”. Todas las escenas funcionan con datos simulados, rotulados como tales.
+8. Después: `delete from public.sessions where code = 'TUCODIGO';` en el SQL editor (la cascada borra todo lo de la sala).
+
+## Probar el celular tú solo
+Abre `/#/ensayo?s=a1_rumor&v=A` en tu celular (o en el navegador con vista móvil): es un jugador simulado sin base de datos. Cambia `s=` por cualquier escena (`a3_decreto`, `a3_danton&arr=1`, `a4_vecino`…) y `v=A|B|C` para ver los tres panfletos.
 
 ## Antes de presentar (checklist)
 - Despierta el proyecto de Supabase el día anterior (los gratuitos se pausan).

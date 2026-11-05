@@ -1,10 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  getPlayer, getSessionByCode, myApprovedPosts, myDecisions, subscribeTables,
+  countActivePlayers, getPlayer, getSessionByCode, listSceneChoices, myApprovedPosts, myDecisions, subscribeTables,
   type DecisionRow, type PlayerRow, type PostRow, type SessionRow,
 } from '../lib/api.ts'
 
+/** Escenas donde ver cómo reacciona el resto de la sala forma parte del dilema. */
+const CROWD_SCENES = ['a1_rumor', 'a3_decreto']
+export type Crowd = { total: number; players: number; by: Record<string, number> }
+
 export type PlayerData = {
+  crowd: Crowd
   session: SessionRow | null
   me: PlayerRow | null
   decisions: DecisionRow[]
@@ -22,6 +27,7 @@ export function usePlayerData(code: string, playerId: string): PlayerData {
   const [me, setMe] = useState<PlayerRow | null>(null)
   const [decisions, setDecisions] = useState<DecisionRow[]>([])
   const [posts, setPosts] = useState<PostRow[]>([])
+  const [crowd, setCrowd] = useState<Crowd>({ total: 0, players: 0, by: {} })
   const [live, setLive] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const busy = useRef(false)
@@ -33,6 +39,12 @@ export function usePlayerData(code: string, playerId: string): PlayerData {
       const [s, p, d, po] = await Promise.all([getSessionByCode(code), getPlayer(playerId), myDecisions(playerId), myApprovedPosts(playerId)])
       setSession(s)
       setMe(p)
+      if (s && CROWD_SCENES.includes(s.scene)) {
+        const [rows, n] = await Promise.all([listSceneChoices(s.id, s.scene), countActivePlayers(s.id)])
+        const by: Record<string, number> = {}
+        for (const r of rows) if (r.prompt_key === 'main') by[r.choice] = (by[r.choice] ?? 0) + 1
+        setCrowd({ total: rows.filter((r) => r.prompt_key === 'main').length, players: n, by })
+      }
       setDecisions((prev) => {
         // conserva decisiones locales aún no vistas en el servidor
         const keys = new Set(d.map((x) => x.scene + '|' + x.prompt_key))
@@ -57,5 +69,5 @@ export function usePlayerData(code: string, playerId: string): PlayerData {
   }, [refresh, playerId])
 
   const addLocalDecision = useCallback((d: DecisionRow) => setDecisions((prev) => [...prev, d]), [])
-  return { session, me, decisions, posts, live, error, refresh, addLocalDecision }
+  return { crowd, session, me, decisions, posts, live, error, refresh, addLocalDecision }
 }

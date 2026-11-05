@@ -7,6 +7,7 @@ import { joinSession, submitDecision } from '../lib/api.ts'
 import { normalizeCode } from '../lib/code.ts'
 import { usePlayerData } from '../hooks/usePlayerData.ts'
 import { actoColor, SceneView, type PCtx } from '../player/PlayerScenes.tsx'
+import { Shell } from '../player/ui.tsx'
 
 type Creds = { player_id: string; token: string; nickname: string }
 const credKey = (code: string) => `citoyen:player:${code}`
@@ -21,7 +22,7 @@ function CodeEntry() {
   const [v, setV] = useState('')
   const [, setParams] = useSearchParams()
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-4 px-4">
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-4 px-5 pb-[env(safe-area-inset-bottom)]">
       <h1 className="font-serif text-5xl font-bold text-gold">Citoyen</h1>
       <p className="text-parchment/70">Escribe el código que ves en el proyector.</p>
       <input className={field + ' text-center uppercase tracking-[0.3em]'} value={v} maxLength={6} inputMode="text" autoCapitalize="characters" onChange={(e) => setV(e.target.value.toUpperCase())} />
@@ -48,10 +49,10 @@ function Join({ code, onJoined }: { code: string; onJoined: (c: Creds) => void }
     } finally { setBusy(false) }
   }
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-4 px-4">
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-4 px-5 pb-[env(safe-area-inset-bottom)]">
       <p className="text-sm uppercase tracking-[0.3em] text-parchment/60">Sala {code}</p>
       <h1 className="font-serif text-5xl font-bold text-gold">Citoyen</h1>
-      <p className="text-parchment/70">Vas a vivir esta historia como un ciudadano francés. Elige un apodo (solo lo verá el presentador).</p>
+      <p className="text-parchment/70">Vas a vivir esta historia como un ciudadano francés. Elige un apodo: solo lo verá el presentador. En el proyector aparecerá tu nombre francés ficticio.</p>
       <input className={field} value={nick} maxLength={20} placeholder="Tu apodo" onChange={(e) => setNick(e.target.value)} autoComplete="off" />
       {error && <p role="alert" className="text-red-300">{error}</p>}
       <button className={btn} disabled={busy || nick.trim().length === 0} onClick={() => void join()}>{busy ? 'Entrando…' : 'Entrar'}</button>
@@ -76,19 +77,13 @@ function Play({ code, creds }: { code: string; creds: Creds }) {
   }
   const scene = ESCENAS.find((s) => s.id === pd.session!.scene) ?? ESCENAS[0]
   const pal = actoColor(scene)
-  const c: PCtx = { creds, session: pd.session, scene, me: pd.me, decisions: pd.decisions, posts: pd.posts, payload: pd.session.scene_payload, send, refresh: pd.refresh }
+  const c: PCtx = { creds, session: pd.session, scene, me: pd.me, decisions: pd.decisions, posts: pd.posts, payload: pd.session.scene_payload, crowd: pd.crowd, send, refresh: pd.refresh }
   return (
-    <div className="min-h-dvh" style={{ background: `radial-gradient(ellipse at 50% -10%, ${pal.glow}33, transparent 60%), #0b0906` }}>
-      <div className="mx-auto max-w-md px-4 pb-10 pt-4">
-        <p className="mb-4 flex items-center justify-between text-xs uppercase tracking-[0.25em] text-parchment/50">
-          <span>{pd.me.identity.nombreFrances}</span>
-          <span style={{ color: pd.live ? undefined : '#e8a73a' }}>{pd.live ? '●' : '○ reconectando'}</span>
-        </p>
-        <motion.div key={scene.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <SceneView c={c} />
-        </motion.div>
-      </div>
-    </div>
+    <Shell pal={pal} acto={scene.acto} name={pd.me.identity.nombreFrances} live={pd.live}>
+      <motion.div key={scene.id} className="flex flex-1 flex-col gap-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <SceneView c={c} />
+      </motion.div>
+    </Shell>
   )
 }
 

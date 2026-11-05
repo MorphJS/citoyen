@@ -67,6 +67,7 @@ function Live({ creds, demo, onExit }: { creds: HostCreds | null; demo: boolean;
   const [toast, setToast] = useState<string | null>(null)
   const [localIdx, setLocalIdx] = useState<number | null>(null)
   const working = useRef(false)
+  const [debate, setDebate] = useState(false)
 
   const data = demoData ?? { session: real.session, players: real.players, decisions: real.decisions, posts: real.posts }
   const sessionIdx = demo
@@ -81,6 +82,7 @@ function Live({ creds, demo, onExit }: { creds: HostCreds | null; demo: boolean;
 
   const go = useCallback(async (i: number) => {
     const j = Math.max(0, Math.min(ESCENAS.length - 1, i))
+    setDebate(false)
     if (demo) { setParams({ s: ESCENAS[j].id }, { replace: true }); return }
     const c = ctx()
     if (!c || working.current) return
@@ -110,6 +112,7 @@ function Live({ creds, demo, onExit }: { creds: HostCreds | null; demo: boolean;
       const k = ev.key.toLowerCase()
       if (ev.key === 'ArrowRight' || ev.key === ' ' || ev.key === 'PageDown') { ev.preventDefault(); void go(index + 1) }
       else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') void go(index - 1)
+      else if (k === 'd') setDebate((x) => !x)
       else if (k === 'a') void doAction('arrestos')
       else if (k === 'f') void doAction('destinos')
       else if (k === 'r') void doAction('rey')
@@ -137,7 +140,7 @@ function Live({ creds, demo, onExit }: { creds: HostCreds | null; demo: boolean;
   const session = data.session!
   return (
     <Deck
-      index={index} go={(i) => void go(i)} demo={demo} toast={toast}
+      index={index} go={(i) => void go(i)} demo={demo} toast={toast} debate={debate}
       offline={!demo && !!real.error}
       joinUrl={demo ? undefined : joinUrlFor(session.code)}
       data={{ session, players: data.players, decisions: data.decisions, posts: data.posts }}

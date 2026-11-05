@@ -85,3 +85,13 @@ export function subscribeTables(name: string, tables: string[], onChange: () => 
   ch.subscribe((status: string) => onStatus?.(status === 'SUBSCRIBED'))
   return () => { void supabase.removeChannel(ch) }
 }
+
+/** Reacciones de toda la sala a una escena (solo conteos): presión social “en vivo”. */
+export async function listSceneChoices(sessionId: string, scene: string): Promise<{ prompt_key: string; choice: string }[]> {
+  return check<{ prompt_key: string; choice: string }[]>(await supabase.from('decisions').select('prompt_key,choice').eq('session_id', sessionId).eq('scene', scene).limit(2000))
+}
+export async function countActivePlayers(sessionId: string): Promise<number> {
+  const res = await supabase.from('players').select('id', { count: 'exact', head: true }).eq('session_id', sessionId).eq('status', 'active')
+  if (res.error) throw new Error(res.error.message)
+  return res.count ?? 0
+}

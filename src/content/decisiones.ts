@@ -5,23 +5,26 @@ import { BALANCE as B } from './balance.ts'
 export type Opcion = { id: string; label: string; sub?: string; delta?: Partial<Meters>; flag?: string }
 export type Prompt = { key: string; pregunta: string; opciones: Opcion[] }
 
-/** Tres variantes de panfleto (Acto 1), repartidas por semilla. Personajes ficticios. */
-export const PANFLETOS = [
-  { id: 'A', titulo: 'Panfleto firmado', firma: 'El Marqués de Valmont (ficticio)', texto: 'Hay trigo guardado en las bodegas del Marqués mientras falta pan en el mercado.', pista: 'Lo firma alguien de alto rango.' },
-  { id: 'B', titulo: 'Panfleto anónimo', firma: 'Sin firma', texto: 'El pan subió dos sous esta semana, según el registro del mercado, que cualquiera puede consultar.', pista: 'No tiene firma, pero cita una fuente que puedes comprobar.' },
-  { id: 'C', titulo: 'Panfleto en disputa', firma: 'Sin firma', texto: 'Otro panfleto asegura que el pan bajará de precio; este afirma lo contrario.', pista: 'Contradice otro panfleto que ya circula.' },
-] as const
-
 export const PROMPTS: Record<string, Prompt[]> = {
   a1_rumor: [
     {
       key: 'main',
-      pregunta: 'Un panfleto circula por tu barrio. ¿Qué haces?',
+      pregunta: 'Tienes el panfleto en la mano. ¿Qué haces?',
       opciones: [
-        { id: 'verificar', label: 'Verificar', sub: 'Cuesta tiempo', delta: { libertad: 5 }, flag: 'verifico' },
+        { id: 'verificar', label: 'Ir a verificarlo', sub: 'Cuesta tiempo mientras otros ya deciden', delta: { libertad: 5 }, flag: 'verifico' },
         { id: 'creer', label: 'Creerlo', delta: { seguridad: 5 } },
         { id: 'compartir', label: 'Compartirlo', delta: { riesgo: B.riesgoPanfleto }, flag: 'compartio' },
-        { id: 'denunciar', label: 'Denunciarlo', sub: 'Al impresor (personaje ficticio)', delta: { riesgo: B.riesgoPanfleto, lealtad: 5 } },
+        { id: 'denunciar', label: 'Denunciarlo', sub: 'A la Guardia, señalando al panadero (personaje ficticio)', delta: { riesgo: B.riesgoPanfleto, lealtad: 5 } },
+        { id: 'ignorar', label: 'Ignorarlo' },
+      ],
+    },
+    {
+      key: 'tras',
+      pregunta: 'Ya sabes la verdad. ¿Qué haces con ella?',
+      opciones: [
+        { id: 'difundir', label: 'Contárselo a tus vecinos', flag: 'difundio' },
+        { id: 'guardia', label: 'Avisar a la Guardia de la sección', delta: { riesgo: B.riesgoPanfleto } },
+        { id: 'callar', label: 'No hacer nada' },
       ],
     },
   ],
@@ -78,6 +81,17 @@ export const PROMPTS: Record<string, Prompt[]> = {
       opciones: [
         { id: 'escribir', label: 'Escribir', sub: `Máx. ${B.maxPost} caracteres, con moderación`, flag: 'escribio' },
         { id: 'no_escribir', label: 'No escribir' },
+      ],
+    },
+  ],
+  a3_danton: [
+    {
+      key: 'main',
+      pregunta: 'Duval, impresor y vecino tuyo (personaje ficticio), fue arrestado esta mañana. ¿Qué haces?',
+      opciones: [
+        { id: 'abogar', label: 'Pedir que se le dé un juicio justo', sub: 'En voz alta, ante los vecinos', delta: { riesgo: 10, libertad: 10 }, flag: 'abogo' },
+        { id: 'callar', label: 'No decir nada' },
+        { id: 'distanciar', label: 'Cruzar la calle y no mencionarlo', delta: { seguridad: 5 }, flag: 'distancio' },
       ],
     },
   ],
@@ -144,7 +158,13 @@ export const HISTORIA: Record<string, Record<string, string>> = {
     verificar: 'Pediste razones: verificaste el panfleto antes de creerlo.',
     creer: 'Creíste el panfleto sin comprobarlo.',
     compartir: 'Compartiste el panfleto con tus vecinos.',
-    denunciar: 'Denunciaste el panfleto ante un impresor (personaje ficticio).',
+    denunciar: 'Denunciaste al panadero del panfleto ante la Guardia (personaje ficticio).',
+    ignorar: 'Guardaste el panfleto y dejaste que otros decidieran.',
+  },
+  a3_danton: {
+    abogar: 'Pediste un juicio justo para un vecino arrestado (ficticio), sabiendo el riesgo.',
+    callar: 'Callaste mientras arrestaban a un vecino (ficticio).',
+    distanciar: 'Te alejaste de un vecino arrestado (ficticio).',
   },
   a3_decreto: {
     aplaudir: 'Aplaudiste la medida del Comité.',
