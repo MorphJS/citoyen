@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ESCENAS, img } from '../content/escenas.ts'
 import Deck from '../host/Deck.tsx'
+import MobileDeck from '../host/MobileDeck.tsx'
+import { useNarrow } from '../hooks/useNarrow.ts'
 import { makeDemo } from '../host/demo.ts'
 import { applyArrests, enterScene, publishFates, type HostCreds, type HostCtx } from '../host/ops.ts'
 import { useHostData } from '../hooks/useHostData.ts'
@@ -68,6 +70,7 @@ function Live({ creds, demo, onExit }: { creds: HostCreds | null; demo: boolean;
   const [localIdx, setLocalIdx] = useState<number | null>(null)
   const working = useRef(false)
   const [debate, setDebate] = useState(false)
+  const narrow = useNarrow()
 
   const data = demoData ?? { session: real.session, players: real.players, decisions: real.decisions, posts: real.posts }
   const sessionIdx = demo
@@ -138,8 +141,10 @@ function Live({ creds, demo, onExit }: { creds: HostCreds | null; demo: boolean;
     )
   }
   const session = data.session!
+  const Stage = narrow ? MobileDeck : Deck
   return (
-    <Deck
+    <Stage
+      onAction={(k: 'arrestos' | 'destinos' | 'rey') => void doAction(k)} onToggleDebate={() => setDebate((x) => !x)}
       index={index} go={(i) => void go(i)} demo={demo} toast={toast} debate={debate}
       offline={!demo && !!real.error}
       joinUrl={demo ? undefined : joinUrlFor(session.code)}

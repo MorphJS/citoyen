@@ -12,6 +12,9 @@ Presentación escolar interactiva: cada compañero, desde su celular, vive la hi
 7. **Sin celulares / sin wifi:** en la pantalla de entrada pulsa “Modo sin celulares”. Todas las escenas funcionan con datos simulados, rotulados como tales.
 8. Después: `delete from public.sessions where code = 'TUCODIGO';` en el SQL editor (la cascada borra todo lo de la sala).
 
+## Presentar desde el celular
+`/#/presentar` detecta pantallas angostas o verticales y muestra una vista móvil: texto grande, desplazamiento vertical, **deslizar ← →** para cambiar de escena y botones para lo que en el proyector son atajos (arrestos, destinos, re-sortear al “rey”, preguntas para debatir). Úsala como control remoto o para ensayar.
+
 ## Probar el celular tú solo
 Abre `/#/ensayo?s=a1_rumor&v=A` en tu celular (o en el navegador con vista móvil): es un jugador simulado sin base de datos. Cambia `s=` por cualquier escena (`a3_decreto`, `a3_danton&arr=1`, `a4_vecino`…) y `v=A|B|C` para ver los tres panfletos.
 
