@@ -92,23 +92,22 @@ function Hero({ e }: { e: Escena }) {
 
 function Synopsis({ e }: { e: Escena }) {
   return (
-    <div className="absolute" style={{ left: '9cqw', right: '9cqw', top: '15cqw' }}>
+    <div className="absolute" style={{ left: '9cqw', top: '14cqw', width: '56cqw' }}>
       <motion.p {...rise(0)} style={kickerStyle}>{e.kicker}</motion.p>
-      <div className="flex items-start justify-between" style={{ marginTop: '2cqw', gap: '6cqw' }}>
-        <div style={{ width: '44cqw' }}>
-          <Title text={e.title} size="5.2cqw" />
-          {e.statement && (
-            <motion.p {...rise(2)} style={{ fontSize: '2.1cqw', lineHeight: 1.22, fontWeight: 600, textTransform: 'uppercase', marginTop: '2cqw' }}>
-              {e.statement}
-            </motion.p>
-          )}
-        </div>
-        {e.body && (
-          <motion.p {...rise(3)} style={{ width: '27cqw', fontSize: '1.2cqw', lineHeight: 1.65, opacity: 0.8, marginTop: '1cqw' }}>
-            {e.body}
-          </motion.p>
-        )}
-      </div>
+      <div style={{ marginTop: '1.6cqw' }}><Title text={e.title} size="5.6cqw" /></div>
+      {e.statement && (
+        <motion.p
+          {...rise(2)}
+          style={{ fontSize: e.statement.length > 110 ? '1.6cqw' : '2.2cqw', lineHeight: 1.25, fontWeight: 600, textTransform: 'uppercase', marginTop: '2.2cqw' }}
+        >
+          {e.statement}
+        </motion.p>
+      )}
+      {e.body && (
+        <motion.div {...rise(3)} style={{ marginTop: '2cqw', paddingLeft: '1.4cqw', borderLeft: '2px solid var(--accent)', maxWidth: '40cqw' }}>
+          <p style={{ fontSize: '1.2cqw', lineHeight: 1.6, opacity: 0.85, margin: 0 }}>{e.body}</p>
+        </motion.div>
+      )}
     </div>
   )
 }
@@ -246,7 +245,10 @@ export default function Presentar() {
         <Grain />
 
         {/* Barra superior, como el menú de un sitio de cine */}
-        <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between" style={{ padding: '1.6cqw 3cqw', fontSize: '0.8cqw', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+        <header
+          className="absolute inset-x-0 top-0 z-10 flex items-center justify-between"
+          style={{ padding: '1.6cqw 3cqw 3.4cqw', fontSize: '0.8cqw', letterSpacing: '0.2em', textTransform: 'uppercase', background: 'linear-gradient(to bottom, rgba(0,0,0,.72), transparent)' }}
+        >
           <span style={{ fontWeight: 600 }}>Citoyen</span>
           <nav className="flex" style={{ gap: '2.4cqw' }}>
             {([1, 2, 3, 4, 5] as const).map((a) => (

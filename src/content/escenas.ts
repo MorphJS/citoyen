@@ -62,9 +62,9 @@ export const ESCENAS: Escena[] = [
   },
   {
     id: 'a1_rumor', acto: 1, layout: 'hero', bg: 'bg_salon', vivo: true,
-    kicker: 'Acto I · El salón', title: 'EL SIGLO DE LAS LUCES',
+    kicker: 'Acto I · Europa, fines del siglo XVII y siglo XVIII', title: 'EL SIGLO DE LAS LUCES',
     statement: 'Comprobar una afirmación antes de creerla, en lugar de aceptarla solo porque la dijo alguien importante.',
-    body: 'El conocimiento se entendía como una forma de combatir la ignorancia.',
+    body: 'La razón, la educación y la ciencia permitían comprender el mundo y mejorar la sociedad.',
   },
   {
     id: 'a1_rumor_reveal', acto: 1, layout: 'cards', bg: 'bg_salon',
@@ -100,7 +100,7 @@ export const ESCENAS: Escena[] = [
     kicker: 'Acto III · El Terror · 1793', title: 'DEFENDER LA REPÚBLICA',
     statement: 'El Comité de Salvación Pública justificaba las medidas extraordinarias como necesarias para defender la República.',
     // TODO(verificar): CONTENIDO no nombra un decreto concreto; el de esta escena es ficticio y así debe decirlo Jesús.
-    body: 'Una medida ficticia, para vivir la decisión: aplaudir, callar o criticar.',
+    body: 'Principalmente entre 1793 y 1794, entre guerras, rebeliones y conflictos internos. Una medida ficticia para decidir: aplaudir, callar o criticar.',
     seals: ['1793', '1794'],
   },
   {
@@ -191,6 +191,12 @@ export const ESCENAS: Escena[] = [
     id: 'cierre', acto: 5, layout: 'synopsis', bg: 'bg_salon',
     kicker: 'Cierre', title: 'LA ÉTICA EN EL EQUIPO',
     statement: 'Cumplir mi parte, reconocer el esfuerzo de mis compañeros y evitar aprovecharme de ellos.',
-    body: 'Aunque pudiera hacerlo sin recibir un castigo. Imágenes: obras y retratos de dominio público (Wikimedia Commons); la sala de Madame Geoffrin, de Lemonnier, CC BY 3.0. Detalle en public/img/CREDITS.json.',
+    body: 'Aunque pudiera hacerlo sin recibir un castigo.',
+  },
+  {
+    id: 'fuentes', acto: 0, layout: 'synopsis', bg: 'bg_bastille',
+    kicker: 'Fuentes', title: 'DE DÓNDE SALE ESTO',
+    statement: 'Open University · OpenStax · World History Encyclopedia · Center for History and New Media · Encyclopedia.com · ERNIE · Stanford Encyclopedia of Philosophy.',
+    body: 'Imágenes: obras y retratos de dominio público de Wikimedia Commons; el salón de Madame Geoffrin, de Lemonnier, CC BY 3.0.',
   },
 ]

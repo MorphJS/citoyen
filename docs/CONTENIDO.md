@@ -51,3 +51,17 @@ Otra respuesta fue el utilitarismo, desarrollado por Jeremy Bentham y John Stuar
 Estas propuestas permiten analizar situaciones desde diferentes ángulos: los principios que seguimos, el respeto que merecen las personas y las consecuencias de nuestras decisiones. Yo lo relaciono con algo cotidiano, como hacer un trabajo en equipo: actuar con ética implica cumplir mi parte, reconocer el esfuerzo de mis compañeros y evitar aprovecharme de ellos, aunque pudiera hacerlo sin recibir un castigo.
 
 [Stanford — Filosofía moral de Kant](https://plato.stanford.edu/entries/kant-moral/) · [Stanford — Historia del utilitarismo](https://plato.stanford.edu/entries/utilitarianism-history/)
+
+---
+
+## Resumen de datos para el proyecto (de Jesús)
+
+**Ilustración:** fines del s. XVII y s. XVIII, Europa ("Siglo de las Luces"). La razón, la educación y la ciencia permiten comprender el mundo y mejorar la sociedad; cuestionar lo aceptado solo por tradición o autoridad. Voltaire: tolerancia religiosa. Montesquieu: distribuir el poder. Rousseau: voluntad general. Diderot y D'Alembert: la Enciclopedia.
+
+**Terror:** principalmente 1793–1794 (guerras, rebeliones, conflictos internos). Comité de Salvación Pública como institución clave; Robespierre figura central, no el único responsable. Desmoulins (Le Vieux Cordelier) ejecutado con Danton en **abril de 1794, antes del Gran Terror**. Gran Terror: junio–julio de 1794; Ley del 22 de pradial (10 de junio de 1794); caída de Robespierre el 27 de julio de 1794.
+
+**Pangermanismo (s. XIX):** ideología nacionalista, no una escuela filosófica única. Algunas corrientes derivaron en nacionalismo excluyente y expansionismo (rechazo a judíos y eslavos; solo como dato histórico, nunca como identidad de jugador). Ejemplo: aspiración de integrar Austria; anexión de Austria en 1938. Pangermanismo ≠ nazismo.
+
+**Ética moderna:** Kant (principios aceptables para todos; dignidad; ejemplo de la cartera). Utilitarismo, Bentham y Mill (consecuencias; mayor bienestar general; ejemplo del agua potable). Cotidiano: trabajo en equipo.
+
+**Fuentes:** Open University y OpenStax (La Ilustración); World History Encyclopedia (El Terror); Center for History and New Media (Ley del 22 de pradial); Wikipedia (Camille Desmoulins); Encyclopedia.com (Pangermanismo); ERNIE (Nacionalismo Romántico en Europa); Stanford Encyclopedia of Philosophy (Kant; historia del utilitarismo).
