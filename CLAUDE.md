@@ -48,11 +48,17 @@ La escena actual vive en una fila `sessions`; todos los clientes se suscriben po
 3. **Nunca denuncias contra compañeros reales.** Toda denuncia/arresto apunta a personajes ficticios (NPC) o ocurre por azar del sistema. Evita acoso entre amigos.
 4. **No asignar identidades de víctima étnica o religiosa a los jugadores** (sobre todo en el acto del pangermanismo). Los pueblos vecinos son neutros. Sin simulaciones de persecución a grupos reales.
 5. **Tono sobrio.** Las condenas se muestran como texto ("tu caso fue condenado"), nunca gráfico. No glorificar ni burlarse.
-6. **Sin fotos de personas reales.** Visuales con ilustración SVG, siluetas, tipografía y textura. Nada de bancos de imágenes.
+6. **Imágenes (decidido por Jesús, reemplaza la regla original):** se usan retratos y obras de época de **dominio público** de Wikimedia Commons, alojadas en `public/img/` con créditos en `public/img/CREDITS.json` (`node scripts/fetch-images.mjs`). Nunca fotos de compañeros, ni imágenes gráficas de ejecuciones, ni desnudos (ojo: el boceto de David del Juramento del Juego de Pelota tiene desnudos; no usarlo). A los jugadores no se les asigna la identidad de personajes históricos reales.
 7. **Moderación:** todo texto libre de jugadores (Le Vieux Cordelier) queda `pending` hasta que el host lo aprueba. Máx. 140 caracteres.
 8. **Degradación elegante:** si falla el wifi, la presentación del host debe poder avanzar escena por escena **sin** celulares.
 9. **Seguridad:** nunca expongas `host_secret` ni tokens de jugador en consultas `select`. Usa el esquema de `DATA_MODEL.sql` tal cual (tablas secretas sin políticas + RPCs `security definer`).
 10. **Sin secretos en el repo:** `.env.local` en `.gitignore`; solo `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` (la anon key es pública por diseño; la seguridad la dan RLS y las RPCs).
+
+## Decisiones de alcance (Jesús, "algo sencillo para una clase del sábado")
+- **Anonimato:** se acepta que `decisions` sea legible con la anon key (es un salón de clase); la UI nunca muestra quién votó qué. Documentado, no resuelto en el esquema.
+- **Apodos:** el proyector solo muestra el conteo de jugadores, nunca apodos; `host_kick_player` queda como válvula.
+- **Arrestos (`a3_danton`):** por azar puro con seed determinista (no "priorizar lealtad"), según la regla 3.
+- **Diseño:** estética de sitio de cine (oscuro, ámbar/teal, título tipográfico enorme, tira de escenas abajo). La presentación del host (`/presentar`) funciona sola con teclado (← → espacio, F = pantalla completa) y `?s=<id_escena>`.
 
 ## Convenciones
 - TypeScript estricto. Sin `any` salvo en el borde con Supabase y con comentario.

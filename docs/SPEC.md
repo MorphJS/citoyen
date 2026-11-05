@@ -112,7 +112,7 @@ Cada final muestra: nombre francés del personaje, tres decisiones clave, una fr
 ## 9. Diseño visual y audio
 - **Paleta por acto:** A1 luz cálida (ámbar, crema, vela); A2 mármol y azul; A3 rojo apagado/ceniza, contraste alto; A4 verde/sepia de mapa; A5 oscuro con dorado.
 - **Tipografía:** serif de época para títulos (Cormorant Garamond / Playfair Display), sans legible (Inter) para UI.
-- **Ilustración:** SVG propio (siluetas de época, sellos, pergaminos, velas). **Sin fotos de personas reales** ni imágenes descargadas de la web.
+- **Imágenes:** retratos y pinturas de época de dominio público (Wikimedia Commons), con tratamiento de color por acto (desaturado + tinte + grano). Sellos de laurel en SVG propio. Ver CLAUDE.md regla 6.
 - **Movimiento:** transiciones de escena cinematográficas, texto que aparece como "escrito", botones que se desvanecen en `a3_pradial`. Respeta `prefers-reduced-motion`.
 - **Audio (opcional, Fase 5):** ambiente muy suave con toggle; apagado por defecto.
 - **Móvil:** ≥ 56 px de alto en botones, fuente ≥ 17 px, vibración corta (`navigator.vibrate`) en eventos fuertes (opcional).

@@ -1,0 +1,121 @@
+{
+  "bg_salon": {
+    "file": "bg_salon.jpg",
+    "title": "File:La Lecture chez Madame Geoffrin.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:La_Lecture_chez_Madame_Geoffrin.jpg",
+    "artist": "Anicet Charles Gabriel Lemonnier",
+    "license": "CC BY 3.0"
+  },
+  "bg_bastille": {
+    "file": "bg_bastille.jpg",
+    "title": "File:Prise de la Bastille.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Prise_de_la_Bastille.jpg",
+    "artist": "Jean-Pierre Houël",
+    "license": "Public domain"
+  },
+  "bg_asamblea": {
+    "file": "bg_asamblea.jpg",
+    "title": "File:Couder Stati generali.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Couder_Stati_generali.jpg",
+    "artist": "Auguste Couder",
+    "license": "Public domain"
+  },
+  "bg_terror": {
+    "file": "bg_terror.jpg",
+    "title": "File:Fête de l'Etre suprême.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:F%C3%AAte_de_l%27Etre_supr%C3%AAme.jpg",
+    "artist": "Unknown authorUnknown author",
+    "license": "Public domain"
+  },
+  "bg_nacion": {
+    "file": "bg_nacion.jpg",
+    "title": "File:Frankfurt Am Main-Jakob Fuerchtegott Dielmann-FFMADIUSAAUNZ-021-Das Innere der Paulskirche als Parlamentshaus.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Frankfurt_Am_Main-Jakob_Fuerchtegott_Dielmann-FFMADIUSAAUNZ-021-Das_Innere_der_Paulskirche_als_Parlamentshaus.jpg",
+    "artist": "Jean Nicolas Ventadour",
+    "license": "Public domain"
+  },
+  "voltaire": {
+    "file": "voltaire.jpg",
+    "title": "File:Nicolas de Largillière - Portrait de Voltaire (1694-1778) en 1718 - P208 - musée Carnavalet.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Nicolas_de_Largilli%C3%A8re_-_Portrait_de_Voltaire_(1694-1778)_en_1718_-_P208_-_mus%C3%A9e_Carnavalet.jpg",
+    "artist": "Nicolas de Largillière",
+    "license": "CC0"
+  },
+  "montesquieu": {
+    "file": "montesquieu.png",
+    "title": "File:Montesquieu - Versailles MV 2976.png",
+    "page": "https://commons.wikimedia.org/wiki/File:Montesquieu_-_Versailles_MV_2976.png",
+    "artist": "After Jacques-Antoine Dassier",
+    "license": "Public domain"
+  },
+  "rousseau": {
+    "file": "rousseau.jpg",
+    "title": "File:Maurice Quentin de La Tour - Portrait de Jean-Jacques Rousseau (1712-1778), écrivain et philosophe - P210 - Musée Carnavalet.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Maurice_Quentin_de_La_Tour_-_Portrait_de_Jean-Jacques_Rousseau_(1712-1778),_%C3%A9crivain_et_philosophe_-_P210_-_Mus%C3%A9e_Carnavalet.jpg",
+    "artist": "Maurice Quentin de La Tour",
+    "license": "Public domain"
+  },
+  "diderot": {
+    "file": "diderot.jpg",
+    "title": "File:Van Loo - Denis Diderot (1767).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Van_Loo_-_Denis_Diderot_(1767).jpg",
+    "artist": "Sammyday (2010-10-23)",
+    "license": "Public domain"
+  },
+  "dalembert": {
+    "file": "dalembert.jpg",
+    "title": "File:Maurice Quentin de La Tour - Jean Le Rond d'Alambert - WGA12353.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Maurice_Quentin_de_La_Tour_-_Jean_Le_Rond_d%27Alambert_-_WGA12353.jpg",
+    "artist": "Maurice Quentin de La Tour",
+    "license": "Public domain"
+  },
+  "encyclopedie": {
+    "file": "encyclopedie.jpg",
+    "title": "File:Encyclopedie frontispice full.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Encyclopedie_frontispice_full.jpg",
+    "artist": "Benoît-Louis Prévost / Charles-Nicolas Cochin",
+    "license": "Public domain"
+  },
+  "robespierre": {
+    "file": "robespierre.jpg",
+    "title": "File:Portrait of Maximilien Robespierre (version Deutsches Historisches Museum).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Portrait_of_Maximilien_Robespierre_(version_Deutsches_Historisches_Museum).jpg",
+    "artist": "AnonymousUnknown author",
+    "license": "Public domain"
+  },
+  "danton": {
+    "file": "danton.jpg",
+    "title": "File:Georges Danton Carnavalet.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Georges_Danton_Carnavalet.jpg",
+    "artist": "Constance Marie Charpentier",
+    "license": "Public domain"
+  },
+  "desmoulins": {
+    "file": "desmoulins.jpg",
+    "title": "File:Anonymous - Portrait de Camille Desmoulins (1760-1794), homme politique. - P867 - Musée Carnavalet.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Anonymous_-_Portrait_de_Camille_Desmoulins_(1760-1794),_homme_politique._-_P867_-_Mus%C3%A9e_Carnavalet.jpg",
+    "artist": "anonymous",
+    "license": "Public domain"
+  },
+  "kant": {
+    "file": "kant.jpg",
+    "title": "File:Immanuel Kant - Gemaelde 1.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Immanuel_Kant_-_Gemaelde_1.jpg",
+    "artist": "Johann Gottlieb Becker (1720-1782)",
+    "license": "Public domain"
+  },
+  "bentham": {
+    "file": "bentham.jpg",
+    "title": "File:Jeremy Bentham by Henry William Pickersgill.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Jeremy_Bentham_by_Henry_William_Pickersgill.jpg",
+    "artist": "Henry William Pickersgill",
+    "license": "Public domain"
+  },
+  "mill": {
+    "file": "mill.jpg",
+    "title": "File:John-stuart-mill-sized.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:John-stuart-mill-sized.jpg",
+    "artist": "as described",
+    "license": "Public domain"
+  }
+}

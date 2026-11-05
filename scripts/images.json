@@ -1,0 +1,70 @@
+{
+  "bg_salon": {
+    "title": "File:La Lecture chez Madame Geoffrin.jpg",
+    "width": 1920
+  },
+  "bg_bastille": {
+    "title": "File:Prise de la Bastille.jpg",
+    "width": 1920
+  },
+  "bg_asamblea": {
+    "title": "File:Couder Stati generali.jpg",
+    "width": 1920
+  },
+  "bg_terror": {
+    "title": "File:Fête de l'Etre suprême.jpg",
+    "width": 1920
+  },
+  "bg_nacion": {
+    "title": "File:Frankfurt Am Main-Jakob Fuerchtegott Dielmann-FFMADIUSAAUNZ-021-Das Innere der Paulskirche als Parlamentshaus.jpg",
+    "width": 1920
+  },
+  "voltaire": {
+    "title": "File:Nicolas de Largillière - Portrait de Voltaire (1694-1778) en 1718 - P208 - musée Carnavalet.jpg",
+    "width": 800
+  },
+  "montesquieu": {
+    "title": "File:Montesquieu - Versailles MV 2976.png",
+    "width": 800
+  },
+  "rousseau": {
+    "title": "File:Maurice Quentin de La Tour - Portrait de Jean-Jacques Rousseau (1712-1778), écrivain et philosophe - P210 - Musée Carnavalet.jpg",
+    "width": 800
+  },
+  "diderot": {
+    "title": "File:Van Loo - Denis Diderot (1767).jpg",
+    "width": 800
+  },
+  "dalembert": {
+    "title": "File:Maurice Quentin de La Tour - Jean Le Rond d'Alambert - WGA12353.jpg",
+    "width": 800
+  },
+  "encyclopedie": {
+    "title": "File:Encyclopedie frontispice full.jpg",
+    "width": 800
+  },
+  "robespierre": {
+    "title": "File:Portrait of Maximilien Robespierre (version Deutsches Historisches Museum).jpg",
+    "width": 800
+  },
+  "danton": {
+    "title": "File:Georges Danton Carnavalet.jpg",
+    "width": 800
+  },
+  "desmoulins": {
+    "title": "File:Anonymous - Portrait de Camille Desmoulins (1760-1794), homme politique. - P867 - Musée Carnavalet.jpg",
+    "width": 800
+  },
+  "kant": {
+    "title": "File:Immanuel Kant - Gemaelde 1.jpg",
+    "width": 800
+  },
+  "bentham": {
+    "title": "File:Jeremy Bentham by Henry William Pickersgill.jpg",
+    "width": 800
+  },
+  "mill": {
+    "title": "File:John-stuart-mill-sized.jpg",
+    "width": 800
+  }
+}
